@@ -15,12 +15,16 @@ async def on_ready():
         await read_message_history(guild)
 
 @bot.event
-async def on_reaction_add(reaction, user):
-    write_to_db(reaction.message.author, reaction.emoji, 1)
+async def on_raw_reaction_add(payload):
+    message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+    print("logged "+str(payload.emoji)+" given to "+message.author.name)
+    write_to_db(message.author, str(payload.emoji), 1)
 
 @bot.event
-async def on_reaction_remove(reaction, user):
-    write_to_db(reaction.message.author, reaction.emoji, -1)
+async def on_raw_reaction_remove(payload):
+    message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+    print("logged "+str(payload.emoji)+" removed from "+message.author.name)
+    write_to_db(message.author, str(payload.emoji), -1)
 
 @bot.event
 async def on_guild_join(guild):
@@ -38,7 +42,7 @@ async def read_message_history(guild):
     for channel in guild.text_channels:
         messages_parsed = 0
         if channel.permissions_for(guild.me).read_messages:
-            async for message in channel.history(limit=None):
+            async for message in channel.history(limit=100):
                 messages_parsed += 1
                 for reaction in message.reactions:
                     user = message.author
