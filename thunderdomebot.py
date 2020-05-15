@@ -24,7 +24,7 @@ async def on_reaction_remove(reaction, user):
 async def on_guild_join(guild):
     read_message_history(guild)
 
-@bot.command(name="reactions", help="Gets the number of reactions a user has received. Defaults to self if no user is provided.")
+@bot.command(name="reactions", help="Gets the number of reactions users have received.")
 async def get_reactions(ctx, emoji: str, user=None):
     users = ctx.mentions
     for user in users:
