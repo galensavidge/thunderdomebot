@@ -82,6 +82,10 @@ def read_from_db(user, emoji: str):
 
 
 if __name__ == "__main__":
-    token_file = open("discord_bot_token.txt")
-    token = token_file.readline()
+    if os.path.exists("discord_bot_token.txt"):
+        token_file = open("discord_bot_token.txt")
+        token = token_file.readline()
+        bot.run(token)
+    else:
+        token = os.environ['BOT_TOKEN']
     bot.run(token)
