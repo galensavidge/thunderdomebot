@@ -4,6 +4,9 @@ discord_bot_token.txt
 # Database directory
 reactions/
 
+# VSCode files
+launch.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
