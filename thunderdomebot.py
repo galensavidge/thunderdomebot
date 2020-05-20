@@ -67,7 +67,7 @@ def write_to_db(user, emoji: str, count):
             new_count = count
 
         if new_count > 0:
-            emojis[emoji] = new_count
+            emojis.update({emoji: new_count})
         else:
             del emojis[emoji]
 
@@ -76,6 +76,8 @@ def write_to_db(user, emoji: str, count):
         if count > 0:
             print("The user id is: {}, the emoji is: {}, and the count is: {}".format(user.id, emoji, count))
             cursor.execute("INSERT into reactions (id, emoji) values ({}, {})".format(user.id, Json({emoji:count})))
+    
+    db.commit()
         
 
 def read_from_db(user, emoji: str):
@@ -96,6 +98,7 @@ def read_from_db(user, emoji: str):
 if __name__ == "__main__":
 
     cursor.execute("CREATE TABLE reactions (id BIGINT PRIMARY KEY, emoji JSONB);")
+    db.commit()
 
     if os.path.exists("discord_bot_token.txt"):
         token_file = open("discord_bot_token.txt")
