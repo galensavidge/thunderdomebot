@@ -72,10 +72,9 @@ def write_to_db(user, emoji: str, count):
         else:
             del emojis[emoji]
 
-        cursor.execute("UPDATE reactions SET emoji = {} WHERE id = {}".format(emojis, user.id))
+        cursor.execute("UPDATE reactions SET emoji = {} WHERE id = {}".format(Json(emojis), user.id))
     else:
         if count > 0:
-            print("The user id is: {}, the emoji is: {}, and the count is: {}".format(user.id, emoji, count))
             cursor.execute("INSERT into reactions (id, emoji) values ({}, {})".format(user.id, Json({emoji:count})))
     
     db.commit()
