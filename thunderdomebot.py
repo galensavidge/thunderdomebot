@@ -7,6 +7,7 @@ from psycopg2.extras import Json, DictCursor
 bot = commands.Bot(command_prefix="tdb!")
 
 database = {}
+
 DATABASE_URL = os.environ['DATABASE_URL']
 db = psycopg2.connect(DATABASE_URL, sslmode='require')
 cursor = db.cursor(cursor_factory=DictCursor)
