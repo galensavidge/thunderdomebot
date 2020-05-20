@@ -59,7 +59,8 @@ async def read_message_history(guild):
 
 def write_to_db(user, emoji: str, count):
     cursor.execute("SELECT emoji FROM reactions WHERE id = {}".format(user.id))
-    emojis = cursor.fetchone()
+    entry = cursor.fetchone()
+    emojis = entry['emoji']
     if emojis is not None:
         if emoji in emojis:
             new_count = emojis.get(emoji) + count
@@ -67,7 +68,7 @@ def write_to_db(user, emoji: str, count):
             new_count = count
 
         if new_count > 0:
-            emojis.update({emoji: new_count})
+            emojis[emoji] = new_count
         else:
             del emojis[emoji]
 
@@ -82,7 +83,8 @@ def write_to_db(user, emoji: str, count):
 
 def read_from_db(user, emoji: str):
     cursor.execute("SELECT emoji FROM reactions WHERE id = {}".format(user.id))
-    emoji_dict = cursor.fetchone()
+    entry = cursor.fetchone()
+    emoji_dict = entry['emoji']
 
     if emoji_dict is not None:
         if emoji in emoji_dict:
