@@ -99,9 +99,6 @@ def read_from_db(user, emoji: str):
 
 if __name__ == "__main__":
 
-    cursor.execute("CREATE TABLE reactions (id BIGINT PRIMARY KEY, emoji JSONB);")
-    db.commit()
-
     if os.path.exists("discord_bot_token.txt"):
         token_file = open("discord_bot_token.txt")
         token = token_file.readline()
