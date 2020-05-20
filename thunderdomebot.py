@@ -94,7 +94,7 @@ def read_from_db(user, emoji: str):
 
 if __name__ == "__main__":
 
-    cursor.execute("CREATE TABLE reactions (id NUM PRIMARY KEY, emoji JSONB);")
+    cursor.execute("CREATE TABLE reactions (id INT PRIMARY KEY, emoji JSONB);")
 
     if os.path.exists("discord_bot_token.txt"):
         token_file = open("discord_bot_token.txt")
