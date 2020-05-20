@@ -1,10 +1,15 @@
 import discord
 import os
 from discord.ext import commands
+import psycopg2
+from psycopg2.extras import Json, DictCursor
 
 bot = commands.Bot(command_prefix="tdb!")
 
 database = {}
+DATABASE_URL = os.environ['DATABASE_URL']
+db = psycopg2.connect(DATABASE_URL, sslmode='require')
+cursor = db.cursor(cursor_factory=DictCursor)
 
 @bot.event
 async def on_ready():
@@ -52,36 +57,44 @@ async def read_message_history(guild):
         print("parsed "+str(messages_parsed)+" messages in "+channel.name)
 
 def write_to_db(user, emoji: str, count):
-    if user in database:
-        sub_db = database[user]
-        if emoji in sub_db:
-            new_count = sub_db.get(emoji) + count
+    cursor.execute("SELECT emoji FROM reactions WHERE id = {}".format(user.id))
+    emojis = cursor.fetchone()
+    if emojis is not None:
+        if emoji in emojis:
+            new_count = emojis.get(emoji) + count
         else:
             new_count = count
-        
+
         if new_count > 0:
-            sub_db[emoji] = new_count
+            emojis[emoji] = new_count
         else:
-            del sub_db[emoji]
+            del emojis[emoji]
+
+        cursor.execute("UPDATE reactions SET emoji = {} WHERE id = {}".format(emojis, user.id))
     else:
         if count > 0:
-            database[user] = {emoji : count}
+            cursor.execute("INSERT into reactions (id, emoji) values ({}, {})".format(user.id, Json({emoji:count})))
         
 
 def read_from_db(user, emoji: str):
-    if user in database:
-        sub_db = database[user]
-        if emoji in sub_db:
-            return sub_db[emoji]
+    cursor.execute("SELECT emoji FROM reactions WHERE id = {}".format(user.id))
+    emoji_dict = cursor.fetchone()
+
+    if emoji_dict is not None:
+        if emoji in emoji_dict:
+            return emoji_dict[emoji]
         else:
-            print("no record of "+emoji+" for the user!")
+            print("no record of " + emoji + " for the user!")
     else:
         print("user not in database!")
-    
+
     return 0
 
 
 if __name__ == "__main__":
+
+    cursor.execute("CREATE TABLE reactions (id NUM PRIMARY KEY, emoji JSONB);")
+
     if os.path.exists("discord_bot_token.txt"):
         token_file = open("discord_bot_token.txt")
         token = token_file.readline()
@@ -89,3 +102,6 @@ if __name__ == "__main__":
     else:
         token = os.environ['BOT_TOKEN']
     bot.run(token)
+
+    cursor.close()
+    db.close()
