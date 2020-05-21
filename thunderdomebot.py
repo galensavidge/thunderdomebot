@@ -62,15 +62,15 @@ async def get_top_messages(ctx, emoji: str = None):
         sql_emoji = "*"
     else:
         sql_emoji = sql_string(emoji)
-    cursor.execute("SELECT message_id, SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score LIMIT 5".format(sql_emoji))
-    data = cursor.fetchall()
+    cursor.execute("SELECT message_id, author_id, SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score LIMIT 5".format(sql_emoji))
+    rows = cursor.fetchall()
 
     response = "**Top messages by number of {}**\n".format(str(emoji))
 
-    for message_count_pair in data:
-        message = await ctx.channel.fetch_message(message_count_pair[0])
+    for row_elements in rows:
+        message = await ctx.guild.get_member(row_elements[1]).fetch_message(row_elements[0])
         if message is not None:
-            response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, message_count_pair[1])
+            response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, row_elements[2])
     
     await ctx.send(response)
 
