@@ -62,7 +62,7 @@ async def get_top_messages(ctx, emoji: str = None):
         sql_emoji = "*"
     else:
         sql_emoji = sql_string(emoji)
-    cursor.execute("SELECT SUM(count) as score FROM messages WHERE emoji_id = {} GROUP BY message_id ORDER BY score LIMIT 5".format(sql_emoji))
+    cursor.execute("SELECT SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score LIMIT 5".format(sql_emoji))
     messages = cursor.fetchall()
     print(messages)
 
