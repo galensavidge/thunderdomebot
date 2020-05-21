@@ -62,13 +62,13 @@ async def get_top_messages(ctx, emoji: str = None):
         sql_emoji = "*"
     else:
         sql_emoji = sql_string(emoji)
-    cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score LIMIT 5".format(sql_emoji))
+    cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score DESC LIMIT 5".format(sql_emoji))
     rows = cursor.fetchall()
 
     response = "**Top messages by number of {}**\n".format(str(emoji))
 
     for row_elements in rows:
-        print("Fetching messages from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
+        print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
         for channel in ctx.guild.text_channels:
             try:
                 message = await channel.fetch_message(row_elements[0])
