@@ -12,92 +12,106 @@ db = psycopg2.connect(DATABASE_URL, sslmode='require')
 cursor = db.cursor(cursor_factory=DictCursor)
 
 
+# Events
+
 @bot.event
 async def on_ready():
     print("Discord bot online!")
 
     # if !database_exists:
     for guild in bot.guilds:
-        await read_message_history(guild)
+        await read_message_history(guild, num_days=1)   # Read one day of history
 
 
 @bot.event
 async def on_raw_reaction_add(payload):
     message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
     print("logged "+str(payload.emoji)+" given to "+message.author.name)
-    write_to_db(message)
+    update_message_in_db(message)
 
 
 @bot.event
 async def on_raw_reaction_remove(payload):
     message = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
     print("logged "+str(payload.emoji)+" removed from "+message.author.name)
-    write_to_db(message)
+    update_message_in_db(message)
 
 
 @bot.event
 async def on_guild_join(guild):
-    await read_message_history(guild)
+    await read_message_history(guild)       # Read entire server message history
 
+
+# Commands
 
 @bot.command(name="reactions", help="Gets the number of reactions of a specific type users have received.")
-async def get_reactions(ctx, emoji: str, user=None):
+async def get_reactions(ctx, emoji: str):
     users = ctx.message.mentions
+    if len(users) == 0:
+        users = [ctx.message.author]
     for user in users:
-        messages = read_from_db(user, emoji)
-        count = 0
-        for message in messages:
-            for reaction in message.reactions:
-                if str(reaction.emoji) == emoji:
-                    count += reaction.count
-                    if reaction.me:
-                        count -= 1
-        
-        await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 else str(count), str(emoji)))
+        cursor.execute("SELECT SUM(count) FROM messages WHERE author_id = {} AND emoji = {}".format(user.id, emoji))
+        count = cursor.fetchone()
+        await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji)))
 
 
-async def read_message_history(guild):
-    one_day_ago = datetime.utcnow() - timedelta(days=1)     # Alternatively this could be configuarble
+@bot.command(name="top", help="Finds the highest reacted message")
+async def get_top(ctx, emoji: str):
+    pass
+
+
+async def read_message_history(guild, num_days = None):
+    '''Parses a server's message history, optionally stopping after num_days of messages'''
+
+    if num_days is not None:
+        cutoff_time = datetime.utcnow() - timedelta(days=num_days)
+    else:
+        cutoff_time = datetime.min()    # Read all history
 
     for channel in guild.text_channels:
         messages_parsed = 0
         if channel.permissions_for(guild.me).read_messages:
-            async for message in channel.history(after=one_day_ago):
+            async for message in channel.history(after=cutoff_time):
                 messages_parsed += 1
-                write_to_db(message)
+                update_message_in_db(message)
         print("parsed "+str(messages_parsed)+" messages in "+channel.name)
   
 
-def write_to_db(message: discord.Message):
-    message_id = message.id
-    user = message.author
-    reaction_list = {}
+# Database helper functions
+
+def update_message_in_db(message: discord.Message):
+    '''Updates all database rows for the passed message'''
+
+    count_list = {}
     for reaction in message.reactions:
         emoji = str(reaction.emoji) # The emoji rendered as a string; ID could also be used, maybe
         count = reaction.count
         if reaction.me:
             count -= 1              # Remove self reactions
         if count > 0:
-            reaction_list[emoji] = count
+            count_list[emoji] = count
     
-    if len(reaction_list) > 0:
-        # Write message to db
-        pass
+    if len(count_list) > 0:
+        for emoji in count_list.keys():
+            write_to_db(message.id, message.author.id, emoji, count_list[emoji])
     else:
-        # Remove message from db
-        pass
+        cursor.execute("DELETE FROM messages WHERE message_id = {}".format(message.id)) # Delete if the message has no reactions
         
 
-async def read_from_db(guild: discord.Guild, emoji: str = None, user: discord.User = None):
-    # Get messages from guild.id matching non-None emoji and user.id
-    message_ids = list()
-    messages = list()
-    for id in message_ids:
-        message = await bot.get_guild(guild.id).fetch_message(id)
-        if message is not None:
-            messages.append(message)
+def write_to_db(message_id: int, author_id: int, emoji: str, count: int):
+    '''Writes one row to the message database'''
 
-    return messages
+    cursor.execute("SELECT emoji FROM messages WHERE message_id = {} AND emoji = {}".format(message_id, emoji))
+    entry = cursor.fetchone()
+    if entry is not None:
+        if count > 0:
+            cursor.execute("UPDATE messages SET count = {} WHERE message_id = {} AND emoji = {}".format(count, message_id, emoji))
+        else:
+            cursor.execute("DELETE FROM messages WHERE message_id = {} AND emoji = {}".format(message_id, emoji))
+    elif count > 0:
+            cursor.execute("INSERT into messages (message_id, author_id, emoji, count) values ({}, {}, {}, {})".format(message_id, author_id, emoji, count))
+    
+    db.commit()
 
 
 if __name__ == "__main__":
