@@ -94,7 +94,7 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
             except discord.NotFound:
                 pass
         
-        if not Found:
+        if not found:
             description += "{}. [Message deleted/not found]\n".format(listnum)  # Print this if the message was not found in any channel
     
     embed = discord.Embed(title=title, description=description)
