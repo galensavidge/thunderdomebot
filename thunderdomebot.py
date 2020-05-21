@@ -73,6 +73,7 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
     cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji, number))
     rows = cursor.fetchall()
     
+    title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
     description = ""
 
     for row_elements in rows:
@@ -83,10 +84,9 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
                 description += "1. {0.author.name}: [message link]({1}) with {2}\n".format(message, message.jump_url.strip("<>"), row_elements[2])
                 break
             except discord.NotFound:
-                description += "1. [Message deleted/not found]"
-                continue
-
-    embed = discord.Embed(title="Top {} messages by {}".format(number, str(emoji)), description=description)
+                description += "1. [Message deleted/not found]\n"
+    
+    embed = discord.Embed(title=title, description=description)
     await ctx.send(embed=embed)
 
 
