@@ -75,16 +75,20 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
     
     title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
     description = ""
+    listnum = 0
 
     for row_elements in rows:
         print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
-        for channel in ctx.guild.text_channels:
+        listnum += 1
+        for channel in ctx.guild.text_channels: # Try to get the message from each channel
             try:
                 message = await channel.fetch_message(row_elements[0])
-                description += "1. {0.author.name}: [message link]({1}) with {2}\n".format(message, message.jump_url.strip("<>"), row_elements[2])
+                description += "{0}. {1.author.name}: [message link]({2}) with {3}\n".format(listnum, message, message.jump_url.strip("<>"), row_elements[2])
                 break
             except discord.NotFound:
-                description += "1. [Message deleted/not found]\n"
+                pass
+        
+        description += "{}. [Message deleted/not found]\n".format(listnum)  # Print this if the message was not found in any channel
     
     embed = discord.Embed(title=title, description=description)
     await ctx.send(embed=embed)
