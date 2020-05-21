@@ -68,7 +68,7 @@ async def get_top_messages(ctx, emoji: str = None):
     response = "**Top messages by number of {}**\n".format(str(emoji))
 
     for message_count_pair in data:
-        message = await bot.get_guild(ctx.guild_id).fetch_message(message_count_pair[0])
+        message = await ctx.guild.fetch_message(message_count_pair[0])
         if message is not None:
             response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, message_count_pair[1])
     
