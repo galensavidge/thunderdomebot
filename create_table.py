@@ -7,5 +7,5 @@ if __name__ == "__main__":
     db = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = db.cursor(cursor_factory=DictCursor)
 
-    cursor.execute("CREATE TABLE messages (message_id BIGINT PRIMARY KEY, author_id BIGINT, emoji TINYTEXT, count INT, last_updated TIMESTAMP ON_UPDATE CURRENT_TIMESTAMP)")
+    cursor.execute("CREATE TABLE messages (message_id BIGINT PRIMARY KEY, author_id BIGINT, emoji TINYTEXT, count INT)")
     db.commit()
