@@ -67,12 +67,16 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
         return
 
     if emoji is None:
-        sql_emoji = ""
+        sql_emoji_command = ""
     else:
-        sql_emoji = "WHERE emoji = "+sql_string(emoji)+" "
-    cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji, number))
+        sql_emoji_command = "WHERE emoji = "+sql_string(emoji)+" "
+    cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji_command, number))
     rows = cursor.fetchall()
     
+    if len(rows) == 0:
+        await ctx.send("No messages found with any {}".format(str(emoji)))
+        return
+
     title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
     description = ""
     listnum = 0
@@ -87,8 +91,10 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
                 description += "{0}. {1.author.name}: [message link]({2}) with {3}\n".format(listnum, message, message.jump_url.strip("<>"), row_elements[2])
                 if number <= 3:
                     message_text = message.content
-                    text_preview = (message_text[:97]+"...") if len(message_text) > 100 else message_text
-                    description += "> "+text_preview+"\n"
+                    if len(message_text) > 0:
+                        text_preview = (message_text[:247]+"...") if len(message_text) > 250 else message_text
+                        description += "> "+text_preview+"\n"
+                    description += "\n"
                 found = True
                 break
             except discord.NotFound:
