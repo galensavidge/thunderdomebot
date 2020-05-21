@@ -39,7 +39,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.event
 async def on_guild_join(guild):
-    await read_message_history(guild, num_days=100)       # Read entire server message history
+    await read_message_history(guild)       # Read entire server message history
 
 
 # Commands
@@ -71,7 +71,7 @@ async def read_message_history(guild, num_days = None):
     for channel in guild.text_channels:
         messages_parsed = 0
         if channel.permissions_for(guild.me).read_messages:
-            async for message in channel.history(after=cutoff_time):
+            async for message in channel.history(limit=200):
                 messages_parsed += 1
                 update_message_in_db(message)
         print("parsed "+str(messages_parsed)+" messages in "+channel.name)
