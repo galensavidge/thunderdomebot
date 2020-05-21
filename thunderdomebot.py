@@ -81,14 +81,21 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
         print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
         listnum += 1
         for channel in ctx.guild.text_channels: # Try to get the message from each channel
+            found = False
             try:
                 message = await channel.fetch_message(row_elements[0])
                 description += "{0}. {1.author.name}: [message link]({2}) with {3}\n".format(listnum, message, message.jump_url.strip("<>"), row_elements[2])
+                if number <= 3:
+                    message_text = message.content
+                    text_preview = (message_text[:97]+"...") if len(message_text) > 100 else message_text
+                    description += "> "+text_preview+"\n"
+                found = True
                 break
             except discord.NotFound:
                 pass
         
-        description += "{}. [Message deleted/not found]\n".format(listnum)  # Print this if the message was not found in any channel
+        if not Found:
+            description += "{}. [Message deleted/not found]\n".format(listnum)  # Print this if the message was not found in any channel
     
     embed = discord.Embed(title=title, description=description)
     await ctx.send(embed=embed)
