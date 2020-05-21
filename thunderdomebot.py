@@ -39,7 +39,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.event
 async def on_guild_join(guild):
-    await read_message_history(guild)       # Read entire server message history
+    await read_message_history(guild, num_days=100)       # Read entire server message history
 
 
 # Commands
@@ -50,9 +50,9 @@ async def get_reactions(ctx, emoji: str):
     if len(users) == 0:
         users = [ctx.message.author]
     for user in users:
-        cursor.execute("SELECT SUM(count) FROM messages WHERE author_id = {} AND emoji = {}".format(user.id, emoji))
+        cursor.execute("SELECT SUM(count) FROM messages WHERE author_id = {} AND emoji = {}".format(user.id, sql_string(emoji)))
         count = cursor.fetchone()
-        await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), sql_string(emoji)))
+        await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji))
 
 
 @bot.command(name="top", help="Finds the highest reacted message")
