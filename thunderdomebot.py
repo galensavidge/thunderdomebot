@@ -72,7 +72,7 @@ async def get_top_messages(ctx, emoji: str = None):
         for channel in ctx.guild.text_channels:
             try:
                 message = await channel.fetch_message(row_elements[0])
-                response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, row_elements[2])
+                response += "1. {0.author.name}: [message link]({0.jump_url}) with {1}\n".format(message, row_elements[2])
                 break
             except discord.NotFound:
                 continue
@@ -91,7 +91,7 @@ async def read_message_history(guild, num_days = None):
     for channel in guild.text_channels:
         messages_parsed = 0
         if channel.permissions_for(guild.me).read_messages:
-            async for message in channel.history(limit=200):
+            async for message in channel.history(limit=None):
                 messages_parsed += 1
                 update_message_in_db(message)
         print("parsed "+str(messages_parsed)+" messages in "+channel.name)
