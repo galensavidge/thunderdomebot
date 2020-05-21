@@ -72,20 +72,21 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
         sql_emoji = "WHERE emoji = "+sql_string(emoji)+" "
     cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji, number))
     rows = cursor.fetchall()
-
-    embed = discord.Embed(title="Top {} messages by {}".format(number, str(emoji)))
+    
+    description = ""
 
     for row_elements in rows:
         print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
         for channel in ctx.guild.text_channels:
             try:
                 message = await channel.fetch_message(row_elements[0])
-                embed.description += "1. {0.author.name}: [message link]({1}) with {2}\n".format(message, message.jump_url.strip("<>"), row_elements[2])
+                description += "1. {0.author.name}: [message link]({1}) with {2}\n".format(message, message.jump_url.strip("<>"), row_elements[2])
                 break
             except discord.NotFound:
-                embed.description += "1. [Message deleted/not found]"
+                description += "1. [Message deleted/not found]"
                 continue
 
+    embed = discord.Embed(title="Top {} messages by {}".format(number, str(emoji)), description=description)
     await ctx.send(embed=embed)
 
 
