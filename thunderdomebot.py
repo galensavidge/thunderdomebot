@@ -88,7 +88,8 @@ async def get_top_messages(ctx, emoji: str = None, number: int = 5):
             found = False
             try:
                 message = await channel.fetch_message(row_elements[0])
-                description += "{0}. {1.author.name}: [message link]({2}) with {3}\n".format(listnum, message, message.jump_url.strip("<>"), row_elements[2])
+                emoji_text = str(emoji)+" " if emoji is not None else " "
+                description += "{0}. {1.author.name} with {2}x{3} ([link]({4}))\n".format(listnum, message, row_elements[2], emoji_text, message.jump_url.strip("<>"))
                 if number <= 3:
                     message_text = message.content
                     if len(message_text) > 0:
