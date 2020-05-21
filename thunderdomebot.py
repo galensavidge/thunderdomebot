@@ -69,12 +69,15 @@ async def get_top_messages(ctx, emoji: str = None):
 
     for row_elements in rows:
         print("Fetching messages from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
-        message = await ctx.guild.get_member(row_elements[1]).fetch_message(row_elements[0])
-        if message is not None:
-            response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, row_elements[2])
+        for channel in ctx.guild.text_channels:
+            try:
+                message = await channel.fetch_message(row_elements[0])
+                response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, row_elements[2])
+                break
+            except discord.NotFound:
+                continue
     
     await ctx.send(response)
-
 
 
 async def read_message_history(guild, num_days = None):
