@@ -52,7 +52,7 @@ async def get_reactions(ctx, emoji: str):
     for user in users:
         cursor.execute("SELECT SUM(count) FROM messages WHERE author_id = {} AND emoji = {}".format(user.id, emoji))
         count = cursor.fetchone()
-        await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji)))
+        await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), sql_string(emoji)))
 
 
 @bot.command(name="top", help="Finds the highest reacted message")
@@ -79,12 +79,15 @@ async def read_message_history(guild, num_days = None):
 
 # Database helper functions
 
+def sql_string(object):
+    return "\'{}\'".format(str(object))
+
 def update_message_in_db(message: discord.Message):
     '''Updates all database rows for the passed message'''
 
     count_list = {}
     for reaction in message.reactions:
-        emoji = str(reaction.emoji) # The emoji rendered as a string; ID could also be used, maybe
+        emoji = sql_string(reaction.emoji) # The emoji rendered as a string; ID could also be used, maybe
         count = reaction.count
         if reaction.me:
             count -= 1              # Remove self reactions
