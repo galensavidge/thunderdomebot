@@ -57,27 +57,36 @@ async def get_reactions(ctx, emoji: str):
 
 
 @bot.command(name="top-messages", help="Finds the highest reacted message")
-async def get_top_messages(ctx, emoji: str = None):
+async def get_top_messages(ctx, emoji: str = None, number: int = 5):
+    if ctx.guild is None:
+        await ctx.send("This command can only be used within a server!")
+        return
+
+    if number < 1 or number > 10:
+        await ctx.send("Number of messages must be between **1** and **10**")
+        return
+
     if emoji is None:
-        sql_emoji = "*"
+        sql_emoji = ""
     else:
-        sql_emoji = sql_string(emoji)
-    cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score DESC LIMIT 5".format(sql_emoji))
+        sql_emoji = "WHERE emoji = "+sql_string(emoji)+" "
+    cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji, number))
     rows = cursor.fetchall()
 
-    response = "**Top messages by number of {}**\n".format(str(emoji))
+    embed = discord.Embed(title="Top {} messages by {}".format(number, str(emoji)))
 
     for row_elements in rows:
         print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
         for channel in ctx.guild.text_channels:
             try:
                 message = await channel.fetch_message(row_elements[0])
-                response += "1. {0.author.name}: [message link]({0.jump_url}) with {1}\n".format(message, row_elements[2])
+                embed.description += "1. {0.author.name}: [message link]({1}) with {2}\n".format(message, message.jump_url.strip("<>"), row_elements[2])
                 break
             except discord.NotFound:
+                embed.description += "1. [Message deleted/not found]"
                 continue
-    
-    await ctx.send(response)
+
+    await ctx.send(embed=embed)
 
 
 async def read_message_history(guild, num_days = None):
