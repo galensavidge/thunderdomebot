@@ -51,7 +51,8 @@ async def get_reactions(ctx, emoji: str):
         users = [ctx.message.author]
     for user in users:
         cursor.execute("SELECT SUM(count) FROM messages WHERE author_id = {} AND emoji = {}".format(user.id, sql_string(emoji)))
-        count = cursor.fetchone()['count']
+        count = cursor.fetchone()
+        print(count)
         await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji)))
 
 
