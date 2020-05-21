@@ -63,16 +63,16 @@ async def get_top_messages(ctx, emoji: str = None):
     else:
         sql_emoji = sql_string(emoji)
     cursor.execute("SELECT message_id, SUM(count) as score FROM messages WHERE emoji = {} GROUP BY message_id ORDER BY score LIMIT 5".format(sql_emoji))
-    messages = cursor.fetchall()
-    print(messages)
+    data = cursor.fetchall()
 
-    # output = "**Top messages by {}**\n".format(str(emoji))
+    response = "**Top messages by number of {}**\n".format(str(emoji))
 
-    #for message_id in messages:
-    #    message = await bot.get_guild(ctx.guild_id).fetch_message(message_id)
-
-    #    if message is not None:
-    #        output += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}".format(message, )
+    for message_count_pair in data:
+        message = await bot.get_guild(ctx.guild_id).fetch_message(message_count_pair[0])
+        if message is not None:
+            response += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}\n".format(message, message_count_pair[1])
+    
+    await ctx.send(response)
 
 
 
