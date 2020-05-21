@@ -5,6 +5,7 @@ import psycopg2
 from psycopg2.extras import Json, DictCursor
 from datetime import datetime, timedelta
 
+
 bot = commands.Bot(command_prefix="tdb!")
 
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -55,9 +56,24 @@ async def get_reactions(ctx, emoji: str):
         await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji)))
 
 
-@bot.command(name="top", help="Finds the highest reacted message")
-async def get_top(ctx, emoji: str):
-    pass
+@bot.command(name="top-messages", help="Finds the highest reacted message")
+async def get_top_messages(ctx, emoji: str = None):
+    if emoji is None:
+        sql_emoji = "*"
+    else:
+        sql_emoji = sql_string(emoji)
+    cursor.execute("SELECT TOP 5 SUM(count) as score FROM messages WHERE emoji_id = {} GROUP BY message_id ORDER BY score".format(sql_emoji))
+    messages = cursor.fetchall()
+    print(messages)
+    
+    # output = "**Top messages by {}**\n".format(str(emoji))
+
+    #for message_id in messages:
+    #    message = await bot.get_guild(ctx.guild_id).fetch_message(message_id)
+
+    #    if message is not None:
+    #        output += "1. {0.author.name}: [<message link>]({0.jump_url}) with {1}".format(message, )
+
 
 
 async def read_message_history(guild, num_days = None):
@@ -81,6 +97,7 @@ async def read_message_history(guild, num_days = None):
 
 def sql_string(object):
     return "\'{}\'".format(str(object))
+
 
 def update_message_in_db(message: discord.Message):
     '''Updates all database rows for the passed message'''
