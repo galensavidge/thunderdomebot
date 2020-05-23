@@ -24,7 +24,7 @@ async def on_ready():
     for guild in bot.guilds:
         await read_message_history(guild, num_days=1)   # Read one day of history
     
-    await bot.change_presence(activity=discord.Game(name="tdb!help | github.com/galensavidge/thunderdomebot"), status=discord.Status.online)
+    await bot.change_presence(activity=discord.Game(name="tdb!help | git.io/Jf27r"), status=discord.Status.online)
 
 
 @bot.event
