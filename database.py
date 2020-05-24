@@ -1,7 +1,7 @@
 import discord
 import os
 import psycopg2
-from psycopg2.extras import Json, DictCursor
+from psycopg2.extras import DictCursor
 
 DATABASE_URL = os.environ['DATABASE_URL']
 db = psycopg2.connect(DATABASE_URL, sslmode='require')
