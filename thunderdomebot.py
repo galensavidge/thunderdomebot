@@ -8,6 +8,7 @@ import database
 
 bot = commands.Bot(command_prefix="tdb!")
 
+github_url = "git.io/Jf27r"
 
 @bot.event
 async def on_ready():
@@ -18,7 +19,12 @@ async def on_ready():
     for guild in bot.guilds:
         await bot.get_cog("Reactions").read_message_history(guild, num_days=1)   # Read one day of history
     
-    await bot.change_presence(activity=discord.Game(name="tdb!help | git.io/Jf27r"), status=discord.Status.online)
+    await bot.change_presence(activity=discord.Game(name="tdb!help | "+github_url), status=discord.Status.online)
+
+
+@bot.command(name="github")
+async def github_link(ctx):
+    await ctx.send("GitHub link: <{}>".format(github_url))
 
 
 if __name__ == "__main__":
