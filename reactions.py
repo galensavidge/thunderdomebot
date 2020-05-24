@@ -45,6 +45,7 @@ class Reactions(Cog):
                     database.update_message_in_db(message)
             print("parsed "+str(messages_parsed)+" messages in "+channel.name)
 
+
     # Commands
 
     @commands.command(name="reactions", help="Gets the number of reactions of a specific type users have received.")
@@ -69,8 +70,8 @@ class Reactions(Cog):
             await ctx.send("This command can only be used within a server!")
             return
 
-        if number < 1 or number > 10:
-            await ctx.send("Number of messages must be between **1** and **10**")
+        if number < 1 or number > 15:
+            await ctx.send("Number of messages must be between **1** and **15**")
             return
 
         if emoji is None:
@@ -96,14 +97,28 @@ class Reactions(Cog):
                 found = False
                 try:
                     message = await channel.fetch_message(row_elements[0])
+
+                    # Title
                     emoji_text = str(emoji)+" " if emoji is not None else " "
                     description += "{0}. {1.author.name} with {2}x{3} ([link]({4}))\n".format(listnum, message, row_elements[2], emoji_text, message.jump_url.strip("<>"))
-                    if number <= 3:
+
+                    # Body
+                    if number <= 5:
+
+                        # Text
                         message_text = message.content
                         if len(message_text) > 0:
                             text_preview = (message_text[:247]+"...") if len(message_text) > 250 else message_text
                             description += "> "+text_preview+"\n"
                         description += "\n"
+
+                        # Image(s)
+                        for attachment in message.attachments:
+                            try:
+                                description += attachment.url+"\n\n"
+                            except: # "If the message this attachment was attached to is deleted, then this will 404."
+                                pass
+
                     found = True
                     break
                 except discord.NotFound:
