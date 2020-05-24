@@ -24,7 +24,7 @@ async def on_ready():
 
 @bot.command(name="github")
 async def github_link(ctx):
-    await ctx.send("GitHub link: <{}>".format(github_url))
+    await ctx.send("GitHub link: <https://{}>".format(github_url))
 
 
 if __name__ == "__main__":
