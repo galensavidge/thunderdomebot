@@ -81,6 +81,7 @@ class Reactions(Cog):
         cursor = database.get_cursor()
         cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji_command, number))
         rows = cursor.fetchall()
+        cursor.close()
         
         if len(rows) == 0:
             await ctx.send("No messages found with any {}".format(str(emoji)))
@@ -89,6 +90,7 @@ class Reactions(Cog):
         title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
         description = ""
         listnum = 0
+        emoji_text = str(emoji)+" " if emoji is not None else " "
 
         for row_elements in rows:
             print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
@@ -99,7 +101,6 @@ class Reactions(Cog):
                     message = await channel.fetch_message(row_elements[0])
 
                     # Title
-                    emoji_text = str(emoji)+" " if emoji is not None else " "
                     description += "{0}. {1.author.name} with {2}x{3} ([link]({4}))\n".format(listnum, message, row_elements[2], emoji_text, message.jump_url.strip("<>"))
 
                     # Body
@@ -127,6 +128,45 @@ class Reactions(Cog):
             if not found:
                 description += "{}. [Message deleted/not found]\n".format(listnum)  # Print this if the message was not found in any channel
         
+        embed = discord.Embed(title=title, description=description)
+        await ctx.send(embed=embed)
+
+
+    @commands.command(name = "leaderboard")
+    async def leaderboard(self, ctx, emoji: str = None, number: int = 5):
+        
+        if number < 1 or number > 20:
+            await ctx.send("Number of messages must be between **1** and **20**")
+            return
+
+        if emoji is None:
+            sql_emoji_command = ""
+        else:
+            sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
+        cursor = database.get_cursor()
+        cursor.execute("SELECT author_id, SUM(count) as score FROM messages {}GROUP BY author_id ORDER BY score DESC LIMIT {}".format(sql_emoji_command, number))
+        rows = cursor.fetchall()
         cursor.close()
+
+        if len(rows) == 0:
+            await ctx.send("No users found with any {}".format(str(emoji)))
+            return
+
+        title = "Top {} by {}".format(str(number)+" users" if number > 1 else "user", str(emoji) if emoji is not None else "all")
+        description = ""
+        listnum = 0
+
+        for row_elements in rows:
+            user = self.bot.get_user(row_elements[0])
+            score = row_elements[1]
+            listnum += 1
+
+            if user is not None:
+                name = user.name
+            else:
+                name = "[User not found]"
+            
+            description += "{}. **{}**{}\n".format(listnum, name.ljust(40), score) # Discord names can be up to 32 characters long
+        
         embed = discord.Embed(title=title, description=description)
         await ctx.send(embed=embed)
