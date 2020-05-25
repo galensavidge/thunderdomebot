@@ -166,7 +166,7 @@ class Reactions(Cog):
             else:
                 name = "[User not found]"
             
-            description += "{}. **{}**{}\n".format(listnum, name.ljust(40), score) # Discord names can be up to 32 characters long
+            description += "{}. **{:<40}**{}\n".format(listnum, name, score) # Discord names can be up to 32 characters long
         
         embed = discord.Embed(title=title, description=description)
         await ctx.send(embed=embed)
