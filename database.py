@@ -44,7 +44,7 @@ def update_message_in_db(message: discord.Message):
 def write_to_db(message_id: int, author_id: int, emoji: str, count: int, time_sent: datetime):
     '''Writes one row to the message database'''
 
-    time_now = sql_string(datetime.now())
+    time_now = sql_string(datetime.utcnow())
     sendtime = sql_string(time_sent)
 
     cursor = get_cursor()

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 from datetime import datetime, timedelta
+import pytz
 
 import database
 
@@ -9,6 +10,8 @@ class Reactions(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.timezone = pytz.timezone("US/Pacific")
+
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -104,7 +107,9 @@ class Reactions(Cog):
                     message = await channel.fetch_message(row_elements[0])
 
                     # Title
-                    description += "{0}. {1.author.name} with {2}x{3} ([link]({4}))\n".format(listnum, message, row_elements[2], emoji_text, message.jump_url.strip("<>"))
+                    local_time = pytz.utc.localize(row_elements[2]).astimezone(self.timezone)
+                    timestamp = local_time.strftime("%a, %b %-d %Y")
+                    description += "{0}. {1.author.name} with {2}x{3} on {4} ([link]({5}))\n".format(listnum, message, row_elements[2], emoji_text, timestamp, message.jump_url.strip("<>"))
 
                     # Body
                     if number <= 5:
