@@ -15,6 +15,6 @@ if __name__ == "__main__":
     db.commit()
 
     cursor.close()
-    db.cose()
+    db.close()
 
     print("Done!")

@@ -38,7 +38,7 @@ class Reactions(Cog):
             if channel.permissions_for(guild.me).read_messages:
                 messages_parsed = 0
 
-                messages_since_update = await channel.history(after=last_update_time).flatten()
+                messages_since_update = await channel.history(after=last_update_time, limit=None).flatten()
                 extra_messages = await channel.history(before=last_update_time, limit=num_messages).flatten()
                 messages = messages_since_update + extra_messages
 
