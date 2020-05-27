@@ -9,5 +9,5 @@ if __name__ == "__main__":
 
     cursor.execute("DROP TABLE messages")
 
-    cursor.execute("CREATE TABLE messages (message_id BIGINT, author_id BIGINT, emoji VARCHAR(128), count INT, time TIMESTAMP)")
+    cursor.execute("CREATE TABLE messages (message_id BIGINT, author_id BIGINT, emoji VARCHAR(128), count INT, updatetime TIMESTAMP)")
     db.commit()

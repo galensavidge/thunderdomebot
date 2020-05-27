@@ -44,18 +44,18 @@ def update_message_in_db(message: discord.Message):
 def write_to_db(message_id: int, author_id: int, emoji: str, count: int):
     '''Writes one row to the message database'''
 
-    time = str(datetime.now())
+    time_now = sql_string(datetime.now())
 
     cursor = get_cursor()
     cursor.execute("SELECT emoji FROM messages WHERE message_id = {} AND emoji = {}".format(message_id, emoji))
     entry = cursor.fetchone()
     if entry is not None:
         if count > 0:
-            cursor.execute("UPDATE messages SET count = {}, time = {} WHERE message_id = {} AND emoji = {}".format(count, time, message_id, emoji))
+            cursor.execute("UPDATE messages SET count = {}, updatetime = {} WHERE message_id = {} AND emoji = {}".format(count, time_now, message_id, emoji))
         else:
             cursor.execute("DELETE FROM messages WHERE message_id = {} AND emoji = {}".format(message_id, emoji))
     elif count > 0:
-            cursor.execute("INSERT into messages (message_id, author_id, emoji, count, time) values ({}, {}, {}, {}, {})".format(message_id, author_id, emoji, count, time))
+            cursor.execute("INSERT into messages (message_id, author_id, emoji, count, updatetime) values ({}, {}, {}, {}, {})".format(message_id, author_id, emoji, count, time_now))
     
     cursor.close()
     db.commit()
@@ -65,7 +65,7 @@ def get_last_update_time():
     '''Returns the time the last database update occurred as a datetime object'''
 
     cursor = get_cursor()
-    cursor.execute("SELECT MAX(time) FROM messages")
+    cursor.execute("SELECT MAX(updatetime) FROM messages")
     time = cursor.fetchone()    # Postgres defaults to ISO 8601 format (yyyy-mm-dd hh:mm:ss.uuuuuu[timezone])
     cursor.close()
     return datetime.strptime(time, "%Y-%m-%d %H-%M-%S.%f")
