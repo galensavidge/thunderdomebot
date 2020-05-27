@@ -109,7 +109,7 @@ class Reactions(Cog):
                     # Title
                     local_time = pytz.utc.localize(row_elements[3]).astimezone(self.timezone)
                     timestamp = local_time.strftime("%a, %b %-d %Y")
-                    description += "{0}. **{1.author.name}** with {2}{3} *[{4}]({5})*\n".format(listnum, message, row_elements[2], emoji_text, timestamp, message.jump_url.strip("<>"))
+                    description += "{0}. **{1.author.name}** with {2}{3}\n".format(listnum, message, row_elements[2], emoji_text)
 
                     # Body
                     if number <= 5:
@@ -126,6 +126,9 @@ class Reactions(Cog):
                                 description += attachment.url+"\n\n"
                             except: # "If the message this attachment was attached to is deleted, then this will 404."
                                 pass
+                        
+                    # Timestamp/link
+                    description += "*[{}]({})*\n\n".format(timestamp, message.jump_url.strip("<>"))
 
                     found = True
                     break
