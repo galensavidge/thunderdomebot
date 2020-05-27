@@ -82,7 +82,7 @@ class Reactions(Cog):
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
         cursor = database.get_cursor()
-        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji_command, number))
+        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score, sendtime DESC LIMIT {}".format(sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
         
