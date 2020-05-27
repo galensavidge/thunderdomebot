@@ -107,7 +107,7 @@ class Reactions(Cog):
                     message = await channel.fetch_message(row_elements[0])
 
                     # Title
-                    local_time = pytz.utc.localize(row_elements[2]).astimezone(self.timezone)
+                    local_time = pytz.timezone("UTC").localize(row_elements[2]).astimezone(self.timezone)
                     timestamp = local_time.strftime("%a, %b %-d %Y")
                     description += "{0}. {1.author.name} with {2}x{3} on {4} ([link]({5}))\n".format(listnum, message, row_elements[2], emoji_text, timestamp, message.jump_url.strip("<>"))
 
