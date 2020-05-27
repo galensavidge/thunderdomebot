@@ -108,7 +108,7 @@ class Reactions(Cog):
 
                     # Title
                     local_time = pytz.utc.localize(row_elements[3]).astimezone(self.timezone)
-                    timestamp = local_time.strftime("%a, %b %-d %Y")
+                    timestamp = local_time.strftime("%A, %B %-d %Y")
                     description += "{0}. **{1.author.name}** with {2}{3}\n".format(listnum, message, row_elements[2], emoji_text)
 
                     # Body
