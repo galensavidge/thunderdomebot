@@ -69,6 +69,6 @@ def get_last_update_time():
 
     cursor = get_cursor()
     cursor.execute("SELECT MAX(updatetime) FROM messages")
-    time = cursor.fetchone()    # Postgres defaults to ISO 8601 format (yyyy-mm-dd hh:mm:ss.uuuuuu[timezone])
+    time = cursor.fetchone()["updatetime"]    # Postgres defaults to ISO 8601 format (yyyy-mm-dd hh:mm:ss.uuuuuu[timezone])
     cursor.close()
     return datetime.strptime(time, "%Y-%m-%d %H-%M-%S.%f")
