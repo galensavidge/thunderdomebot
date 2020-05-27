@@ -96,7 +96,7 @@ class Reactions(Cog):
         title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
         description = ""
         listnum = 0
-        emoji_text = str(emoji)+" " if emoji is not None else " "
+        emoji_text = str(emoji)+"x " if emoji is not None else " "
 
         for row_elements in rows:
             print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
@@ -109,7 +109,7 @@ class Reactions(Cog):
                     # Title
                     local_time = pytz.utc.localize(row_elements[3]).astimezone(self.timezone)
                     timestamp = local_time.strftime("%a, %b %-d %Y")
-                    description += "{0}. {1.author.name} with {2}x{3} on {4} ([link]({5}))\n".format(listnum, message, row_elements[2], emoji_text, timestamp, message.jump_url.strip("<>"))
+                    description += "{0}. **{1.author.name}** with {2}{3} *[{4}]({5})*\n".format(listnum, message, row_elements[2], emoji_text, timestamp, message.jump_url.strip("<>"))
 
                     # Body
                     if number <= 5:
