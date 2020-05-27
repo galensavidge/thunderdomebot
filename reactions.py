@@ -96,7 +96,7 @@ class Reactions(Cog):
         title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
         description = ""
         listnum = 0
-        emoji_text = str(emoji)+"x " if emoji is not None else " "
+        emoji_text = "x"+str(emoji)+" " if emoji is not None else " "
 
         for row_elements in rows:
             print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
@@ -118,8 +118,7 @@ class Reactions(Cog):
                         message_text = message.content
                         if len(message_text) > 0:
                             text_preview = (message_text[:247]+"...") if len(message_text) > 250 else message_text
-                            description += "> "+text_preview+"\n"
-                        description += "\n"
+                            description += "> "+text_preview+"\n\n"
 
                         # Image(s)
                         for attachment in message.attachments:
