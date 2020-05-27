@@ -34,28 +34,31 @@ def update_message_in_db(message: discord.Message):
     
     if len(count_list) > 0:
         for emoji in count_list.keys():
-            write_to_db(message.id, message.author.id, emoji, count_list[emoji])
+            write_to_db(message.id, message.author.id, emoji, count_list[emoji], message.created_at)
     else:
         cursor = get_cursor()
         cursor.execute("DELETE FROM messages WHERE message_id = {}".format(message.id)) # Delete if the message has no reactions
         cursor.close()
         
 
-def write_to_db(message_id: int, author_id: int, emoji: str, count: int):
+def write_to_db(message_id: int, author_id: int, emoji: str, count: int, time_sent: datetime):
     '''Writes one row to the message database'''
 
     time_now = sql_string(datetime.now())
+    sendtime = sql_string(time_sent)
 
     cursor = get_cursor()
     cursor.execute("SELECT emoji FROM messages WHERE message_id = {} AND emoji = {}".format(message_id, emoji))
     entry = cursor.fetchone()
     if entry is not None:
         if count > 0:
-            cursor.execute("UPDATE messages SET count = {}, updatetime = {} WHERE message_id = {} AND emoji = {}".format(count, time_now, message_id, emoji))
+            cursor.execute("UPDATE messages SET count = {}, sendtime = {}, updatetime = {} WHERE message_id = {} AND emoji = {}" \
+                                                                            .format(count, sendtime, time_now, message_id, emoji))
         else:
             cursor.execute("DELETE FROM messages WHERE message_id = {} AND emoji = {}".format(message_id, emoji))
     elif count > 0:
-            cursor.execute("INSERT into messages (message_id, author_id, emoji, count, updatetime) values ({}, {}, {}, {}, {})".format(message_id, author_id, emoji, count, time_now))
+            cursor.execute("INSERT into messages (message_id, author_id, emoji, count, sendtime, updatetime) values ({}, {}, {}, {}, {}, {})" \
+                                                                            .format(message_id, author_id, emoji, count, sendtime, time_now))
     
     cursor.close()
     db.commit()
