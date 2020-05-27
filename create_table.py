@@ -9,9 +9,12 @@ if __name__ == "__main__":
 
     print("Creating messages table...")
 
-    cursor.execute("DROP TABLE messages")
+    # cursor.execute("DROP TABLE messages")
 
     cursor.execute("CREATE TABLE messages (message_id BIGINT, author_id BIGINT, emoji VARCHAR(128), count INT, sendtime TIMESTAMP, updatetime TIMESTAMP)")
     db.commit()
+
+    cursor.close()
+    db.cose()
 
     print("Done!")
