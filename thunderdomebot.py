@@ -17,7 +17,7 @@ async def on_ready():
 
     # if !database_exists:
     for guild in bot.guilds:
-        await bot.get_cog("Reactions").read_message_history(guild, num_days=1)   # Read one day of history
+        await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
     
     await bot.change_presence(activity=discord.Game(name="tdb!help | "+github_url), status=discord.Status.online)
 

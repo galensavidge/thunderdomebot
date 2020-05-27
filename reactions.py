@@ -29,21 +29,24 @@ class Reactions(Cog):
         await self.read_message_history(guild)       # Read entire server message history
 
 
-    async def read_message_history(self, guild, num_days = None):
-        '''Parses a server's message history, optionally stopping after num_days of messages'''
+    async def read_message_history(self, guild, num_messages = None):
+        '''Parses a server's message history, optionally stopping after num_messages of messages'''
 
-        if num_days is not None:
-            cutoff_time = datetime.utcnow() - timedelta(days=num_days)
-        else:
-            cutoff_time = datetime.min()    # Read all history
+        last_update_time = database.get_last_update_time()
 
         for channel in guild.text_channels:
-            messages_parsed = 0
             if channel.permissions_for(guild.me).read_messages:
-                async for message in channel.history(limit=200):
+                messages_parsed = 0
+
+                messages_since_update = await channel.history(after=last_update_time).flatten()
+                extra_messages = await channel.history(before=last_update_time, limit=num_messages).flatten()
+                messages = messages_since_update + extra_messages
+
+                for message in messages:
                     messages_parsed += 1
                     database.update_message_in_db(message)
-            print("parsed "+str(messages_parsed)+" messages in "+channel.name)
+                
+                print("parsed "+str(messages_parsed)+" messages in "+channel.name)
 
 
     # Commands
