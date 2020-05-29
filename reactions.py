@@ -180,3 +180,4 @@ class Reactions(Cog):
         
         embed = discord.Embed(title=title, description=description)
         await ctx.send(embed=embed)
+        
