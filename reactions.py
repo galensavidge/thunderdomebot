@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 from datetime import datetime, timedelta
+import pytz
 
 import database
 
@@ -9,6 +10,8 @@ class Reactions(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.timezone = pytz.timezone("US/Pacific")
+
     
     @Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -29,21 +32,24 @@ class Reactions(Cog):
         await self.read_message_history(guild)       # Read entire server message history
 
 
-    async def read_message_history(self, guild, num_days = None):
-        '''Parses a server's message history, optionally stopping after num_days of messages'''
+    async def read_message_history(self, guild, num_messages = None):
+        '''Parses a server's message history, optionally stopping after num_messages of messages'''
 
-        if num_days is not None:
-            cutoff_time = datetime.utcnow() - timedelta(days=num_days)
-        else:
-            cutoff_time = datetime.min()    # Read all history
+        last_update_time = database.get_last_update_time()
 
         for channel in guild.text_channels:
-            messages_parsed = 0
             if channel.permissions_for(guild.me).read_messages:
-                async for message in channel.history(limit=200):
+                messages_parsed = 0
+
+                messages_since_update = await channel.history(after=last_update_time, limit=None).flatten()
+                extra_messages = await channel.history(before=last_update_time, limit=num_messages).flatten()
+                messages = messages_since_update + extra_messages
+
+                for message in messages:
                     messages_parsed += 1
                     database.update_message_in_db(message)
-            print("parsed "+str(messages_parsed)+" messages in "+channel.name)
+                
+                print("parsed "+str(messages_parsed)+" messages in "+channel.name)
 
 
     # Commands
@@ -79,7 +85,7 @@ class Reactions(Cog):
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
         cursor = database.get_cursor()
-        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score FROM messages {}GROUP BY message_id ORDER BY score DESC LIMIT {}".format(sql_emoji_command, number))
+        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score, MAX(sendtime) as time FROM messages {}GROUP BY message_id ORDER BY score DESC, time DESC LIMIT {}".format(sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
         
@@ -90,7 +96,7 @@ class Reactions(Cog):
         title = "Top {} by {}".format(str(number)+" messages" if number > 1 else "message", str(emoji) if emoji is not None else "all")
         description = ""
         listnum = 0
-        emoji_text = str(emoji)+" " if emoji is not None else " "
+        emoji_text = "x"+str(emoji)+" " if emoji is not None else " "
 
         for row_elements in rows:
             print("Fetching message from {} with ID = {}".format(ctx.guild.get_member(row_elements[1]).name, row_elements[0]))
@@ -101,7 +107,9 @@ class Reactions(Cog):
                     message = await channel.fetch_message(row_elements[0])
 
                     # Title
-                    description += "{0}. {1.author.name} with {2}x{3} ([link]({4}))\n".format(listnum, message, row_elements[2], emoji_text, message.jump_url.strip("<>"))
+                    local_time = pytz.utc.localize(row_elements[3]).astimezone(self.timezone)
+                    timestamp = local_time.strftime("%A, %B %-d %Y")
+                    description += "{0}. **{1.author.name}** with {2}{3}\n".format(listnum, message, row_elements[2], emoji_text)
 
                     # Body
                     if number <= 5:
@@ -110,8 +118,7 @@ class Reactions(Cog):
                         message_text = message.content
                         if len(message_text) > 0:
                             text_preview = (message_text[:247]+"...") if len(message_text) > 250 else message_text
-                            description += "> "+text_preview+"\n"
-                        description += "\n"
+                            description += "> "+text_preview+"\n\n"
 
                         # Image(s)
                         for attachment in message.attachments:
@@ -119,6 +126,9 @@ class Reactions(Cog):
                                 description += attachment.url+"\n\n"
                             except: # "If the message this attachment was attached to is deleted, then this will 404."
                                 pass
+                        
+                    # Timestamp/link
+                    description += "*[{}]({})*\n\n".format(timestamp, message.jump_url.strip("<>"))
 
                     found = True
                     break
