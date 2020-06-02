@@ -1,10 +1,11 @@
 import discord
+import pytz
 from discord.ext import commands
 from discord.ext.commands import Cog
 from datetime import datetime, timedelta
-import pytz
 
 import database
+import tables
 
 class Reactions(Cog):
 
@@ -17,25 +18,26 @@ class Reactions(Cog):
     async def on_raw_reaction_add(self, payload):
         message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         print("logged "+str(payload.emoji)+" given to "+message.author.name)
-        database.update_message_in_db(message)
+        database.update_message_in_db(message, payload.guild_id)
 
 
     @Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         print("logged "+str(payload.emoji)+" removed from "+message.author.name)
-        database.update_message_in_db(message)
+        database.update_message_in_db(message, payload.guild_id)
 
 
     @Cog.listener()
     async def on_guild_join(self, guild):
+        tables.create_guild_tables(guild.id)
         await self.read_message_history(guild)       # Read entire server message history
 
 
     async def read_message_history(self, guild, num_messages = None):
         '''Parses a server's message history, optionally stopping after num_messages of messages'''
 
-        last_update_time = database.get_last_update_time()
+        last_update_time = database.get_last_update_time(guild.id)
 
         for channel in guild.text_channels:
             if channel.permissions_for(guild.me).read_messages:
@@ -47,7 +49,7 @@ class Reactions(Cog):
 
                 for message in messages:
                     messages_parsed += 1
-                    database.update_message_in_db(message)
+                    database.update_message_in_db(message, guild.id)
                 
                 print("parsed "+str(messages_parsed)+" messages in "+channel.name)
 
@@ -63,7 +65,7 @@ class Reactions(Cog):
             users = [ctx.message.author]
         
         for user in users:
-            cursor.execute("SELECT SUM(count) FROM messages WHERE author_id = {} AND emoji = {}".format(user.id, database.sql_string(emoji)))
+            cursor.execute("SELECT SUM(count) FROM {}_messages WHERE author_id = {} AND emoji = {}".format(ctx.guild.id, user.id, database.sql_string(emoji)))
             count = cursor.fetchone()[0]
             await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji)))
         
@@ -85,7 +87,7 @@ class Reactions(Cog):
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
         cursor = database.get_cursor()
-        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score, MAX(sendtime) as time FROM messages {}GROUP BY message_id ORDER BY score DESC, time DESC LIMIT {}".format(sql_emoji_command, number))
+        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score, MAX(sendtime) as time FROM {}_messages {}GROUP BY message_id ORDER BY score DESC, time DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
         
@@ -154,7 +156,7 @@ class Reactions(Cog):
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
         cursor = database.get_cursor()
-        cursor.execute("SELECT author_id, SUM(count) as score FROM messages {}GROUP BY author_id ORDER BY score DESC LIMIT {}".format(sql_emoji_command, number))
+        cursor.execute("SELECT author_id, SUM(count) as score FROM {}_messages {}GROUP BY author_id ORDER BY score DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
 
