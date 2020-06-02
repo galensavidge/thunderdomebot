@@ -40,7 +40,7 @@ def update_message_in_db(message: discord.Message, guild_id: int):
             write_to_db(message.id, message.author.id, emoji, count_list[emoji], message.created_at, guild_id)
     else:
         cursor = get_cursor()
-        cursor.execute("DELETE FROM {}_messages WHERE message_id = {}".format(guild_id, message.id)) # Delete if the message has no reactions
+        cursor.execute("DELETE FROM messages_{} WHERE message_id = {}".format(guild_id, message.id)) # Delete if the message has no reactions
         cursor.close()
         
 
@@ -49,7 +49,7 @@ def write_to_db(message_id: int, author_id: int, emoji: str, count: int, time_se
 
     time_now = sql_string(datetime.utcnow())
     sendtime = sql_string(time_sent)
-    table_name = "{}_messages".format(guild_id)
+    table_name = "messages_{}".format(guild_id)
 
     cursor = get_cursor()
     cursor.execute("SELECT emoji FROM {} WHERE message_id = {} AND emoji = {}".format(table_name, message_id, emoji))
@@ -72,7 +72,7 @@ def get_last_update_time(guild_id:int):
     '''Returns the time the last database update occurred as a datetime object'''
 
     cursor = get_cursor()
-    cursor.execute("SELECT MAX(updatetime) FROM {}_messages".format(guild_id))
+    cursor.execute("SELECT MAX(updatetime) FROM messages_{}".format(guild_id))
     time = cursor.fetchone()[0]    # Postgres' default time format can be automatically converted to a datetime
     cursor.close()
     return time
