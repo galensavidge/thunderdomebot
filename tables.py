@@ -14,4 +14,3 @@ def create_guild_tables(guild_id):
         print("Successfully created table ", table_name)
 
         cursor.close()
-        database.close()
