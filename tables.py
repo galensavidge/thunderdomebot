@@ -1,7 +1,7 @@
 import database
 
 def create_guild_tables(guild_id):
-    table_name = "{}_messages".format(guild_id)
+    table_name = "messages_{}".format(guild_id)
     cursor = database.get_cursor()
 
     cursor.execute("SELECT to_regclass({})".format(table_name))

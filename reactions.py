@@ -65,7 +65,7 @@ class Reactions(Cog):
             users = [ctx.message.author]
         
         for user in users:
-            cursor.execute("SELECT SUM(count) FROM {}_messages WHERE author_id = {} AND emoji = {}".format(ctx.guild.id, user.id, database.sql_string(emoji)))
+            cursor.execute("SELECT SUM(count) FROM messages_{} WHERE author_id = {} AND emoji = {}".format(ctx.guild.id, user.id, database.sql_string(emoji)))
             count = cursor.fetchone()[0]
             await ctx.send("User {0} has received {1} {2}".format(user.name, "no" if count == 0 or count is None else str(count), str(emoji)))
         
@@ -87,7 +87,7 @@ class Reactions(Cog):
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
         cursor = database.get_cursor()
-        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score, MAX(sendtime) as time FROM {}_messages {}GROUP BY message_id ORDER BY score DESC, time DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
+        cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score, MAX(sendtime) as time FROM messages_{} {}GROUP BY message_id ORDER BY score DESC, time DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
         
@@ -156,7 +156,7 @@ class Reactions(Cog):
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
         cursor = database.get_cursor()
-        cursor.execute("SELECT author_id, SUM(count) as score FROM {}_messages {}GROUP BY author_id ORDER BY score DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
+        cursor.execute("SELECT author_id, SUM(count) as score FROM messages_{} {}GROUP BY author_id ORDER BY score DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
 
