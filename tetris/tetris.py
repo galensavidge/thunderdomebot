@@ -21,7 +21,7 @@ class TetrisCog(Cog):
     @commands.command(name="tetris", help="Starts an inline Tetris game here!")
     async def play_tetris(self, ctx):
         message = await ctx.send("Game starting...")
-        TetrisCog.add_all_emoji(message)
+        await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
         self.active_games[message] = game
         game.run()
@@ -56,7 +56,7 @@ class Tetris(threading.Thread):
 
     # GUI
     gui_grid_x = 36
-    gui_grid_y = 2
+    gui_grid_y = 36
     gui_square_width = 3
     gui_squre_height = 2
     saved_x = 3
@@ -115,9 +115,12 @@ class Tetris(threading.Thread):
         # Longer queue of tetromino types
         self.next_batch = list()
 
+        print("Enqueuing Tetromino...")
+
         # Set up tetromino queue and pop first tetromino
         while len(self.next) < self.next_length:
             self.enqueueTetromino()
+        print("Popping Tetromino...")
         self.popTetromino()
 
     def run(self):

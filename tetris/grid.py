@@ -1,7 +1,6 @@
 # grid.py
 
 # Class that holds references to grid objects
-# Grid.init(w, h) must be called before grid objects can be intitialized
 class Grid:
     
     def __init__(self, width, height):
@@ -10,10 +9,14 @@ class Grid:
         self.objects = [[None for i in range(width)] for j in range(height)]
 
     def setObject(self, x, y, obj):
-        self.objects[y][x] = obj
+        if self.checkBounds(x, y):
+            self.objects[y][x] = obj
 
     def getObject(self, x, y):
-        return self.objects[y][x]
+        if self.checkBounds(x, y):
+            return self.objects[y][x]
+        else:
+            return None
 
     def checkBounds(self, x, y):
         return x >= 0 and x < self.width and y >= 0 and y < self.height
