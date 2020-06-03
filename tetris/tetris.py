@@ -24,7 +24,6 @@ class TetrisCog(Cog):
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
         TetrisCog.active_games[message.id] = game
-        game.run()
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -32,7 +31,7 @@ class TetrisCog(Cog):
         if user != self.bot.user:
             game = TetrisCog.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
-                game.controlEvent(str(reaction.emoji))
+                await game.controlEvent(str(reaction.emoji))
                 await reaction.message.remove_reaction(reaction, user)
     
     @Cog.listener()
@@ -133,12 +132,9 @@ class Tetris(threading.Thread):
         # Longer queue of tetromino types
         self.next_batch = list()
 
-        print("Enqueuing Tetromino...")
-
         # Set up tetromino queue and pop first tetromino
         while len(self.next) < self.next_length:
             self.enqueueTetromino()
-        print("Popping Tetromino...")
         self.popTetromino()
 
     def run(self):
@@ -201,9 +197,9 @@ class Tetris(threading.Thread):
             self.last_message_text = text
             await self.message.edit(content=text)
 
-    def controlEvent(self, action: str):
+    async def controlEvent(self, action: str):
         self.actions[action]()
-        self.updateMessage()
+        await self.updateMessage()
 
     def cw(self):
         if self.t.rotate(True): # Rotate clockwise
