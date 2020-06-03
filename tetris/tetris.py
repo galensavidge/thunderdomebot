@@ -76,10 +76,10 @@ class Tetris(threading.Thread):
     gui_grid_y = 46
     gui_square_width = 1
     gui_squre_height = 1
-    saved_x = 3
-    saved_y = 3
+    saved_x = 2
+    saved_y = 2
     queue_x = 37
-    queue_y = 3
+    queue_y = 2
     queue_spacing = 6
     
     # Number of tetrominos to queue on screen
@@ -89,6 +89,9 @@ class Tetris(threading.Thread):
     difficulty_level_time = 5 # In seconds
     
     def __init__(self, ctx, message):
+        super.__init__(self)
+
+        # Message
         self.ctx = ctx
         self.message = message
         self.last_message_text = ""
