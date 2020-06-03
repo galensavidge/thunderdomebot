@@ -32,7 +32,7 @@ class TetrisCog(Cog):
         if user != self.bot.user:
             game = TetrisCog.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
-                await game.controlEvent(str(reaction.emoji))
+                game.controlEvent(str(reaction.emoji))
                 await reaction.message.remove_reaction(reaction, user)
     
     @Cog.listener()
@@ -59,7 +59,7 @@ class TetrisCog(Cog):
 
 class Tetris(threading.Thread):
 
-    update_time = 1
+    update_time = 0.5
 
     # Main board
     grid_x = 10
@@ -198,9 +198,8 @@ class Tetris(threading.Thread):
             self.last_message_text = text
             await self.message.edit(content=text)
 
-    async def controlEvent(self, action: str):
+    def controlEvent(self, action: str):
         self.actions[action]()
-        await self.updateMessage()
 
     def cw(self):
         if self.t.rotate(True): # Rotate clockwise
