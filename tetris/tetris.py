@@ -12,7 +12,7 @@ from tetris.asciigraphics import Frame
 class TetrisCog(Cog):
 
     # up, down, left, right, cw, ccw, save, quit
-    emoji_list = ["\u2B06", "\u2B07", "\u27A1", "\u2B05", "\u21A9", "\u21AA", "\u2705", "\u274C"]
+    emoji_list = ["\u2B06", "\u2B07", "\u2B05", "\u27A1", "\u21A9", "\u21AA", "\u2705", "\u274C"]
 
     def __init__(self, bot):
         self.bot = bot
@@ -28,10 +28,11 @@ class TetrisCog(Cog):
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        game = self.active_games[reaction.message]
-        if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
-            game.controlEvent(str(reaction.emoji))
-            reaction.message.remove_reaction(reaction, user)
+        if user != self.bot:
+            game = self.active_games.get(reaction.message, None)
+            if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
+                game.controlEvent(str(reaction.emoji))
+                reaction.message.remove_reaction(reaction, user)
     
     @staticmethod
     async def add_all_emoji(message: discord.Message):
