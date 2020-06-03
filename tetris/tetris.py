@@ -48,16 +48,16 @@ class Tetris(threading.Thread):
     # Main board
     grid_x = 10
     grid_y = 22
-    square_width = 4
-    square_height = 3
+    square_width = 3
+    square_height = 2
     board_position_x = 10
     board_position_y = 10
     spawn_x = 5
     spawn_y = 1
 
     # GUI
-    gui_grid_x = 56
-    gui_grid_y = 70
+    gui_grid_x = 40
+    gui_grid_y = 44
     gui_square_width = 1
     gui_squre_height = 1
     saved_x = 3
