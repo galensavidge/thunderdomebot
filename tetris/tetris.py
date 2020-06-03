@@ -33,7 +33,7 @@ class TetrisCog(Cog):
             game = self.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
                 game.controlEvent(str(reaction.emoji))
-                reaction.message.remove_reaction(reaction, user)
+                await reaction.message.remove_reaction(reaction, user)
             else:
                 print("Game not found")
     
@@ -53,8 +53,8 @@ class Tetris(threading.Thread):
     grid_y = 22
     square_width = 3
     square_height = 2
-    board_position_x = 10
-    board_position_y = 10
+    board_position_x = 4
+    board_position_y = 4
     spawn_x = 5
     spawn_y = 1
 
@@ -183,6 +183,8 @@ class Tetris(threading.Thread):
 
         # Update message
         if self.gui_board.frame.updated:
+            self.gui_board.frame.drawRectangle(Tetris.board_position_x-1, Tetris.board_position_y-1, \
+                Tetris.grid_x*Tetris.square_width+1, Tetris.grid_y*Tetris.square_height+1)
             text = "```{}```".format(self.gui_board)
             await self.message.edit(content=text)
 
