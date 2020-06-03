@@ -84,10 +84,10 @@ class Tetris(threading.Thread):
         
         # Control emoji pairs
         self.actions = \
-           {TetrisCog.emoji_list[0] : self.up(),    TetrisCog.emoji_list[1] : self.down(), \
-            TetrisCog.emoji_list[2] : self.left(),  TetrisCog.emoji_list[3] : self.right(), \
-            TetrisCog.emoji_list[4] : self.cw(),    TetrisCog.emoji_list[5] : self.ccw(), \
-            TetrisCog.emoji_list[6] : self.save(),  TetrisCog.emoji_list[7] : self.quit()}
+           {TetrisCog.emoji_list[0] : self.up,    TetrisCog.emoji_list[1] : self.down, \
+            TetrisCog.emoji_list[2] : self.left,  TetrisCog.emoji_list[3] : self.right, \
+            TetrisCog.emoji_list[4] : self.cw,    TetrisCog.emoji_list[5] : self.ccw, \
+            TetrisCog.emoji_list[6] : self.save,  TetrisCog.emoji_list[7] : self.quit}
 
         # General game timer
         self.timer = 0
@@ -180,7 +180,7 @@ class Tetris(threading.Thread):
                 await self.message.edit(text)
 
     def controlEvent(self, action: str):
-        self.actions[action]
+        self.actions[action]()
         self.updateMessage()
 
     def cw(self):
