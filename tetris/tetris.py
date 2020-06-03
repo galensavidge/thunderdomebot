@@ -3,7 +3,7 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
-import random, threading, time
+import random, threading, time, asyncio
 
 from tetris.tetrisboard import Board, Tetromino
 from tetris.asciigraphics import Frame
@@ -42,7 +42,7 @@ class TetrisCog(Cog):
 
 class Tetris(threading.Thread):
 
-    update_time = 0.5
+    update_time = 1
 
     # Main board
     grid_x = 10
@@ -154,7 +154,8 @@ class Tetris(threading.Thread):
             else:
                 self.spawn_timer = 0
 
-            self.updateMessage()
+            print("Updating message...")
+            asyncio.get_event_loop().run_until_complete(self.updateMessage())
 
             time.sleep(Tetris.update_time)
         
