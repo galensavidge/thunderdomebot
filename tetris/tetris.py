@@ -34,7 +34,7 @@ class TetrisCog(Cog):
             reaction.message.remove_reaction(reaction, user)
     
     @staticmethod
-    def add_all_emoji(message):
+    async def add_all_emoji(message: discord.Message):
         await message.clear_reactions()
         for emoji in TetrisCog.emoji_list:
             await message.add_reaction(emoji)
