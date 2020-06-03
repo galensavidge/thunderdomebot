@@ -54,18 +54,18 @@ class Tetris(threading.Thread):
     square_width = 3
     square_height = 2
     board_position_x = 4
-    board_position_y = 4
+    board_position_y = 1
     spawn_x = 5
     spawn_y = 1
 
     # GUI
     gui_grid_x = 40
-    gui_grid_y = 44
+    gui_grid_y = 46
     gui_square_width = 1
     gui_squre_height = 1
     saved_x = 3
     saved_y = 3
-    queue_x = 31
+    queue_x = 37
     queue_y = 3
     queue_spacing = 6
     
