@@ -16,20 +16,20 @@ class TetrisCog(Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.active_games = {}  # Format: {message : game}
+        self.active_games = {}  # Format: {message id : game}
     
     @commands.command(name="tetris", help="Starts an inline Tetris game here!")
     async def play_tetris(self, ctx):
         message = await ctx.send("Game starting...")
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
-        self.active_games[message] = game
+        self.active_games[message.id] = game
         game.run()
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
         if user != self.bot:
-            game = self.active_games.get(reaction.message, None)
+            game = self.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
                 game.controlEvent(str(reaction.emoji))
                 reaction.message.remove_reaction(reaction, user)
