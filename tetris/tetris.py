@@ -89,7 +89,7 @@ class Tetris(threading.Thread):
     difficulty_level_time = 5 # In seconds
     
     def __init__(self, ctx, message):
-        super.__init__(self)
+        threading.Thread.__init__(self)
 
         # Message
         self.ctx = ctx
