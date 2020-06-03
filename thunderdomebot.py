@@ -4,6 +4,7 @@ import os
 
 from reactions import Reactions
 import database
+from tetris.tetris import TetrisCog
 
 
 bot = commands.Bot(command_prefix="tdb!")
@@ -36,6 +37,7 @@ if __name__ == "__main__":
         token = os.environ['BOT_TOKEN']
     
     bot.add_cog(Reactions(bot))
+    bot.add_cog(TetrisCog(bot))
     bot.run(token)
 
     database.close()
