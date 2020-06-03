@@ -55,12 +55,21 @@ class Block(GridObject):
 
     def draw(self):
         if self.x != self.old_x or self.y != self.old_y:
-            self.board.frame.erase(self.old_x*self.board.square_width, self.old_y*self.board.square_height, self.board.square_width, self.board.square_height)
-            self.board.frame.fill(self.x*self.board.square_width, self.y*self.board.square_height, self.board.square_width, self.board.square_height, self.char)
+            self.erase_rect()
+            self.draw_rect()
             self.old_x = self.x
             self.old_y = self.y
 
+    def draw_rect(self):
+        self.board.frame.fill(self.x*self.board.square_width, self.y*self.board.square_height, self.board.square_width, self.board.square_height, self.char)
+
+    def erase_rect(self):
+        self.board.frame.erase(self.old_x*self.board.square_width, self.old_y*self.board.square_height, self.board.square_width, self.board.square_height)
+
     def changeBoard(self, board, x, y):
+        # Erase self from board
+        self.erase_rect()
+
         # Change board references
         if self.grid.getObject(self.x, self.y) == self:
             self.grid.setObject(self.x, self.y, None)
@@ -74,9 +83,11 @@ class Block(GridObject):
         self.old_y = self.y
 
         # Draw new rectangle
+        self.draw_rect()
     
     def delete(self):
         GridObject.delete(self)
+        self.erase_rect()
         self.board.blocks.remove(self)
 
 
