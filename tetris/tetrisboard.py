@@ -55,8 +55,8 @@ class Block(GridObject):
 
     def draw(self):
         if self.x != self.old_x or self.y != self.old_y:
-            self.board.frame.erase(self.old_x, self.old_y, self.old_x+self.board.square_width, self.old_x+self.board.square_height)
-            self.board.frame.fill(self.x, self.y, self.x+self.board.square_width, self.y+self.board.square_height, self.char)
+            self.board.frame.erase(self.old_x*self.board.square_width, self.old_y*self.board.square_height, self.board.square_width, self.board.square_height)
+            self.board.frame.fill(self.x*self.board.square_width, self.y*self.board.square_height, self.board.square_width, self.board.square_height, self.char)
             self.old_x = self.x
             self.old_y = self.y
 
