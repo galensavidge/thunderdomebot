@@ -178,7 +178,7 @@ class Tetris(threading.Thread):
         # Update message
         if self.gui_board.frame.updated:
             text = "```{}```".format(self.gui_board)
-            await self.message.edit(text)
+            await self.message.edit(content=text)
 
     def controlEvent(self, action: str):
         self.actions[action]()
