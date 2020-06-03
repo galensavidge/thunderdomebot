@@ -11,8 +11,8 @@ from tetris.asciigraphics import Frame
 
 class TetrisCog(Cog):
 
-    # up, down, left, right, cw, ccw, save, quit
-    emoji_list = ["\u2B06", "\u2B07", "\u2B05", "\u27A1", "\u21A9", "\u21AA", "\u2705", "\u274C"]
+    # up, down, left, right, ccw, cw, save, quit
+    emoji_list = ["\u2B06", "\u2B07", "\u2B05", "\u27A1", "\u21AA", "\u21A9", "\u2705", "\u274C"]
 
     def __init__(self, bot):
         self.bot = bot
@@ -98,7 +98,7 @@ class Tetris(threading.Thread):
         self.actions = \
            {TetrisCog.emoji_list[0] : self.up,    TetrisCog.emoji_list[1] : self.down, \
             TetrisCog.emoji_list[2] : self.left,  TetrisCog.emoji_list[3] : self.right, \
-            TetrisCog.emoji_list[4] : self.cw,    TetrisCog.emoji_list[5] : self.ccw, \
+            TetrisCog.emoji_list[4] : self.ccw,   TetrisCog.emoji_list[5] : self.cw, \
             TetrisCog.emoji_list[6] : self.save,  TetrisCog.emoji_list[7] : self.quit}
 
         # General game timer
