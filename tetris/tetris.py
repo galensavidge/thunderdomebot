@@ -125,6 +125,9 @@ class Tetris(threading.Thread):
         self.popTetromino()
 
     def run(self):
+        asyncio.get_event_loop().run_until_complete(self.loop())
+
+    async def loop(self):
         '''Runs the game thread.'''
 
         print("Started a Tetris game!")
@@ -156,7 +159,7 @@ class Tetris(threading.Thread):
                 self.spawn_timer = 0
 
             print("Updating message...")
-            asyncio.get_event_loop().run_until_complete(self.updateMessage())
+            await self.updateMessage()
 
             time.sleep(Tetris.update_time)
         
