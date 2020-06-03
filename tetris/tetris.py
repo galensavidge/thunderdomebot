@@ -28,15 +28,22 @@ class TetrisCog(Cog):
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        print("Tetris reaction add event!")
         if user != self.bot.user:
             game = self.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
+                print("Tetris reaction add event!")
                 game.controlEvent(str(reaction.emoji))
                 await reaction.message.remove_reaction(reaction, user)
-            else:
-                print("Game not found")
     
+    @Cog.listener()
+    async def on_message_delete(self, message):
+        self.remove_game(message.id)
+
+    def remove_game(self, message_id):
+        if message_id in self.active_games:
+            self.active_games.pop(message_id)
+            print("Removed a Tetris game.")
+
     @staticmethod
     async def add_all_emoji(message: discord.Message):
         await message.clear_reactions()
@@ -78,6 +85,7 @@ class Tetris(threading.Thread):
     def __init__(self, ctx, message):
         self.ctx = ctx
         self.message = message
+        self.last_message_text = ""
 
         # State
         self.playing = True
@@ -171,21 +179,19 @@ class Tetris(threading.Thread):
     async def updateMessage(self):
         '''Updates the game boards and pushes any changes to the message.'''
 
-        # Update main board
+        # Update boards
         self.main_board.draw()
-
-        # Draw main board on GUI board
-        if self.main_board.frame.updated:
-            self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
-        
-        # Update GUI board
         self.gui_board.draw()
 
+        # Draw main board on GUI board
+        self.gui_board.frame.drawRectangle(Tetris.board_position_x-1, Tetris.board_position_y-1, \
+            Tetris.grid_x*Tetris.square_width+1, Tetris.grid_y*Tetris.square_height+1)
+        self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
+        
         # Update message
-        if self.gui_board.frame.updated:
-            self.gui_board.frame.drawRectangle(Tetris.board_position_x-1, Tetris.board_position_y-1, \
-                Tetris.grid_x*Tetris.square_width+1, Tetris.grid_y*Tetris.square_height+1)
-            text = "```{}```".format(self.gui_board)
+        text = "```{}```".format(self.gui_board)
+        if text != self.last_message_text:
+            self.last_message_text = text
             await self.message.edit(content=text)
 
     def controlEvent(self, action: str):

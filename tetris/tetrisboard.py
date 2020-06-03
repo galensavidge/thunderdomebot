@@ -10,7 +10,6 @@ class Board(Grid):
         Grid.__init__(self, width, height)
         self.square_width = square_width
         self.square_height = square_height
-        self.blocks = []
         self.frame = Frame(width*square_width, height*square_height)
 
     def rowFull(self, row):
@@ -21,7 +20,8 @@ class Board(Grid):
         return True
     
     def draw(self):
-        for b in self.blocks:
+        self.frame.clear()
+        for b in self.getAllObjects():
             b.draw()
 
     def __str__(self):

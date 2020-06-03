@@ -20,6 +20,16 @@ class Grid:
 
     def checkBounds(self, x, y):
         return x >= 0 and x < self.width and y >= 0 and y < self.height
+    
+    def getAllObjects(self):
+        objects = []
+        for i in range(self.width):
+            for j in range(self.height):
+                o = self.getObject(i, j)
+                if o is not None:
+                    objects.append(o)
+        
+        return objects
 
 # GridObject(grid, x, y)
 class GridObject(object):

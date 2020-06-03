@@ -8,7 +8,6 @@ class Frame:
         self.width = width
         self.height = height
         self.contents = [[" " for j in range(0, width)] for i in range(0, height)]  # contents[row][col] aka contents[y][x]
-        self.updated = False    # True when the frame has changed since the last call to str()
     
 
     def drawChar(self, x, y, char: str):
@@ -16,7 +15,6 @@ class Frame:
 
         if x in range(0, self.width) and y in range(0, self.height):
             self.contents[y][x] = char[0]
-            self.updated = True
 
 
     def fill(self, x, y, width, height, char: str):
@@ -31,6 +29,12 @@ class Frame:
         '''Erases a width by height area with top left corner at (x, y).''' 
 
         self.fill(x, y, width, height, " ")
+    
+    
+    def clear(self):
+        '''Clears the contents of the Frame.'''
+
+        self.erase(0, 0, self.width, self.height)
     
 
     def drawRectangle(self, x, y, width, height):
@@ -66,7 +70,6 @@ class Frame:
 
 
     def __str__(self):
-        self.updated = False
         s = ""
         for row in self.contents:
             s += "".join(row)+"\n"
