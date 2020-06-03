@@ -1,6 +1,7 @@
 # tetrisboard.py
-from grid import Grid, GridObject
-from asciigraphics import Frame
+
+from tetris.grid import Grid, GridObject
+from tetris.asciigraphics import Frame
 
 # Grid board class
 class Board(Grid):

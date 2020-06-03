@@ -5,8 +5,8 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 import random, threading, time
 
-from tetrisboard import Board, Tetromino
-from asciigraphics import Frame
+from tetris.tetrisboard import Board, Tetromino
+from tetris.asciigraphics import Frame
 
 
 class TetrisCog(Cog):
