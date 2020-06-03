@@ -157,7 +157,7 @@ class Tetris(threading.Thread):
         
         print("Finished a Tetris game!")
 
-    def updateMessage(self):
+    async def updateMessage(self):
         '''Updates the game boards and pushes any changes to the message.'''
 
         # Update main board
@@ -177,7 +177,7 @@ class Tetris(threading.Thread):
             if self.message is None:
                 self.message = await self.ctx.send(text)
             else:
-                self.message.edit(text)
+                await self.message.edit(text)
 
     def controlEvent(self, action: str):
         self.actions[action]
