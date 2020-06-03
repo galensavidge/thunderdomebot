@@ -48,18 +48,18 @@ class Tetris(threading.Thread):
     # Main board
     grid_x = 10
     grid_y = 22
-    square_width = 6
-    square_height = 4
+    square_width = 4
+    square_height = 3
     board_position_x = 10
     board_position_y = 10
     spawn_x = 5
     spawn_y = 1
 
     # GUI
-    gui_grid_x = 36
-    gui_grid_y = 36
-    gui_square_width = 3
-    gui_squre_height = 2
+    gui_grid_x = 56
+    gui_grid_y = 70
+    gui_square_width = 1
+    gui_squre_height = 1
     saved_x = 3
     saved_y = 3
     queue_x = 31
@@ -80,8 +80,8 @@ class Tetris(threading.Thread):
         self.playing = True
 
         # Boards
-        self.main_board = Board(self.grid_x, self.grid_y, self.board_position_x, self.board_position_y, Tetris.square_width, Tetris.square_height)
-        self.gui_board = Board(self.gui_grid_x, self.gui_grid_y, 0, 0, Tetris.gui_square_width, Tetris.gui_squre_height)
+        self.main_board = Board(self.grid_x, self.grid_y, Tetris.square_width, Tetris.square_height)
+        self.gui_board = Board(self.gui_grid_x, self.gui_grid_y, Tetris.gui_square_width, Tetris.gui_squre_height)
         
         # Control emoji pairs
         self.actions = \

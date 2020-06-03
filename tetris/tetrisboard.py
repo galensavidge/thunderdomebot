@@ -6,10 +6,8 @@ from tetris.asciigraphics import Frame
 # Grid board class
 class Board(Grid):
 
-    def __init__(self, width, height, origin_x, origin_y, square_width, square_height):
+    def __init__(self, width, height, square_width, square_height):
         Grid.__init__(self, width, height)
-        self.x = origin_x
-        self.y = origin_y
         self.square_width = square_width
         self.square_height = square_height
         self.blocks = []
