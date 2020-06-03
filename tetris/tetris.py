@@ -28,11 +28,14 @@ class TetrisCog(Cog):
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        print("Tetris reaction add event!")
         if user != self.bot:
             game = self.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
                 game.controlEvent(str(reaction.emoji))
                 reaction.message.remove_reaction(reaction, user)
+            else:
+                print("Game not found")
     
     @staticmethod
     async def add_all_emoji(message: discord.Message):
