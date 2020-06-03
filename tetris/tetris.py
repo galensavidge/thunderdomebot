@@ -23,20 +23,21 @@ class TetrisCog(Cog):
         message = await ctx.send("Game starting...")
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
-        self.active_games[message.id] = game
+        TetrisCog.active_games[message.id] = game
         game.run()
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        print("Tetris reaction add event!")
         if user != self.bot.user:
-            game = self.active_games.get(reaction.message.id, None)
+            game = TetrisCog.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
-                print("Tetris reaction add event!")
                 game.controlEvent(str(reaction.emoji))
                 await reaction.message.remove_reaction(reaction, user)
     
     @Cog.listener()
     async def on_message_delete(self, message):
+        print("Tetris message delete event!")
         TetrisCog.remove_game(message.id)
 
     @staticmethod
