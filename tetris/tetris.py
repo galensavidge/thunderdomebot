@@ -157,7 +157,7 @@ class Tetris(threading.Thread):
         
         print("Finished a Tetris game!")
 
-    async def updateMessage(self):
+    def updateMessage(self):
         '''Updates the game boards and pushes any changes to the message.'''
 
         # Update main board
