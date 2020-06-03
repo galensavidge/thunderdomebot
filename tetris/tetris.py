@@ -13,10 +13,10 @@ class TetrisCog(Cog):
 
     # up, down, left, right, ccw, cw, save, quit
     emoji_list = ["\u2B06", "\u2B07", "\u2B05", "\u27A1", "\u21AA", "\u21A9", "\u2705", "\u274C"]
+    active_games = {}  # Format: {message id : game}
 
     def __init__(self, bot):
         self.bot = bot
-        self.active_games = {}  # Format: {message id : game}
     
     @commands.command(name="tetris", help="Starts an inline Tetris game here!")
     async def play_tetris(self, ctx):
@@ -37,11 +37,16 @@ class TetrisCog(Cog):
     
     @Cog.listener()
     async def on_message_delete(self, message):
-        self.remove_game(message.id)
+        TetrisCog.remove_game(message.id)
 
-    def remove_game(self, message_id):
-        if message_id in self.active_games:
-            self.active_games.pop(message_id)
+    @staticmethod
+    def remove_game(message_id):
+        game = TetrisCog.active_games.get(message_id, None)
+        if game is not None:
+            game.playing = False
+        
+        if message_id in TetrisCog.active_games:
+            TetrisCog.active_games.pop(message_id)
             print("Removed a Tetris game.")
 
     @staticmethod
@@ -175,6 +180,7 @@ class Tetris(threading.Thread):
             time.sleep(Tetris.update_time)
         
         print("Finished a Tetris game!")
+        TetrisCog.remove_game(self.message.id)
 
     async def updateMessage(self):
         '''Updates the game boards and pushes any changes to the message.'''
