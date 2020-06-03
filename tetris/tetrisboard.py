@@ -1,4 +1,4 @@
-# tetromino.py
+# tetrisboard.py
 from grid import Grid, GridObject
 from asciigraphics import Frame
 
