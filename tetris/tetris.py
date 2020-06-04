@@ -100,10 +100,10 @@ class Tetris:
         self.playing = True
 
         # Boards
-        self.main_board = Board(self.board_width, self.board_height, Tetris.square_width, Tetris.square_height)
-        self.gui_board = Board(self.gui_width, self.gui_height, Tetris.gui_square_width, Tetris.gui_squre_height)
+        self.main_board = Board(Tetris.board_width, Tetris.board_height, Tetris.square_width, Tetris.square_height)
+        self.gui_board = Board(Tetris.gui_width, Tetris.gui_height, Tetris.gui_square_width, Tetris.gui_squre_height)
 
-        print("Main board:\n")
+        print("Main board Frame: width={0.width}, height={0.height}".format(self.main_board.frame))
         
         # Control emoji pairs
         self.actions = \
