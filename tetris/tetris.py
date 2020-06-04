@@ -64,8 +64,8 @@ class Tetris:
     update_time = 0.5
 
     # Main board
-    grid_x = 10
-    grid_y = 22
+    board_width = 10
+    board_height = 22
     square_width = 3
     square_height = 2
     board_position_x = 4
@@ -74,8 +74,8 @@ class Tetris:
     spawn_y = 1
 
     # GUI
-    gui_grid_x = 40
-    gui_grid_y = 46
+    gui_width = 40
+    gui_height = 46
     gui_square_width = 1
     gui_squre_height = 1
     saved_x = 2
@@ -100,8 +100,10 @@ class Tetris:
         self.playing = True
 
         # Boards
-        self.main_board = Board(self.grid_x, self.grid_y, Tetris.square_width, Tetris.square_height)
-        self.gui_board = Board(self.gui_grid_x, self.gui_grid_y, Tetris.gui_square_width, Tetris.gui_squre_height)
+        self.main_board = Board(self.board_width, self.board_height, Tetris.square_width, Tetris.square_height)
+        self.gui_board = Board(self.gui_width, self.gui_height, Tetris.gui_square_width, Tetris.gui_squre_height)
+
+        print("Main board:\n")
         
         # Control emoji pairs
         self.actions = \
@@ -178,6 +180,8 @@ class Tetris:
             await asyncio.sleep(Tetris.update_time)
         
         print("Finished a Tetris game!")
+        self.message.edit(content="Game over!")
+        self.message.clear_reactions()
         TetrisCog.remove_game(self.message.id)
 
     async def updateMessage(self):
@@ -189,11 +193,11 @@ class Tetris:
 
         # Draw main board on GUI board
         self.gui_board.frame.drawRectangle(Tetris.board_position_x-1, Tetris.board_position_y-1, \
-            Tetris.grid_x*Tetris.square_width+1, Tetris.grid_y*Tetris.square_height+1)
+            Tetris.board_width*Tetris.square_width+1, Tetris.board_height*Tetris.square_height+1)
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
         # Update message
-        text = "```{}```".format(self.gui_board)
+        text = "```{}```".format(self.main_board)
         if text != self.last_message_text:
             self.last_message_text = text
             await self.message.edit(content=text)
@@ -291,17 +295,17 @@ class Tetris:
         # Check for filled rows
         filled_rows = 0
         
-        for y in range(Tetris.grid_y):
+        for y in range(Tetris.board_height):
             if self.main_board.rowFull(y):
                 filled_rows += 1
                 
                 # Delete objects in this row
-                for x in range(Tetris.grid_x):
+                for x in range(Tetris.board_width):
                     self.main_board.getObject(x, y).delete()
 
                 # Move blocks above this down by one space
                 for j in range(y, -1, -1):
-                    for x in range(Tetris.grid_x):
+                    for x in range(Tetris.board_width):
                         o = self.main_board.getObject(x, j)
                         if o is not None:
                             self.main_board.getObject(x, j).move(o.x, o.y + 1)
