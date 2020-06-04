@@ -20,7 +20,6 @@ class TetrisCog(Cog):
     
     @commands.command(name="tetris", help="Starts an inline Tetris game here!")
     async def play_tetris(self, ctx):
-        message = await ctx.send("Game starting...")
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
         TetrisCog.active_games[message.id] = game
@@ -28,7 +27,6 @@ class TetrisCog(Cog):
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        print("Tetris reaction add event!")
         if user != self.bot.user:
             game = TetrisCog.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
@@ -39,7 +37,6 @@ class TetrisCog(Cog):
     
     @Cog.listener()
     async def on_message_delete(self, message):
-        print("Tetris message delete event!")
         TetrisCog.remove_game(message.id)
 
     @staticmethod
@@ -50,7 +47,6 @@ class TetrisCog(Cog):
         
         if message_id in TetrisCog.active_games:
             TetrisCog.active_games.pop(message_id)
-            print("Removed a Tetris game.")
 
     @staticmethod
     async def add_all_emoji(message: discord.Message):
@@ -102,8 +98,6 @@ class Tetris:
         # Boards
         self.main_board = Board(Tetris.board_width, Tetris.board_height, Tetris.square_width, Tetris.square_height)
         self.gui_board = Board(Tetris.gui_width, Tetris.gui_height, Tetris.gui_square_width, Tetris.gui_squre_height)
-
-        print("Main board Frame: width={0.width}, height={0.height}".format(self.main_board.frame))
         
         # Control emoji pairs
         self.actions = \
@@ -174,7 +168,6 @@ class Tetris:
             else:
                 self.spawn_timer = 0
 
-            print("Updating message...")
             await self.updateMessage()
 
             await asyncio.sleep(Tetris.update_time)
