@@ -57,6 +57,7 @@ class Block(GridObject):
         # Change board references
         if self.grid.getObject(self.x, self.y) == self:
             self.grid.setObject(self.x, self.y, None)
+        self.board = board
         self.grid = board
         self.grid.setObject(x, y, self)
 
