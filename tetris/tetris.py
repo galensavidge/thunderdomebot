@@ -66,8 +66,8 @@ class Tetris:
     # Main board
     board_width = 10
     board_height = 22
-    square_width = 1
-    square_height = 1
+    square_width = 3
+    square_height = 2
     board_position_x = 4
     board_position_y = 1
     spawn_x = 5
