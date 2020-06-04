@@ -63,8 +63,6 @@ class Block(GridObject):
         # Reset position
         self.x = x
         self.y = y
-        self.old_x = self.x
-        self.old_y = self.y
     
     def delete(self):
         GridObject.delete(self)

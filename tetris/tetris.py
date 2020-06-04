@@ -24,7 +24,7 @@ class TetrisCog(Cog):
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
         TetrisCog.active_games[message.id] = game
-        game.start()
+        asyncio.create_task(game.loop())
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -57,7 +57,7 @@ class TetrisCog(Cog):
             await message.add_reaction(emoji)
 
 
-class Tetris(threading.Thread):
+class Tetris:
 
     update_time = 0.5
 
@@ -89,8 +89,6 @@ class Tetris(threading.Thread):
     difficulty_level_time = 5 # In seconds
     
     def __init__(self, ctx, message):
-        threading.Thread.__init__(self)
-
         # Message
         self.ctx = ctx
         self.message = message
@@ -141,9 +139,6 @@ class Tetris(threading.Thread):
             self.enqueueTetromino()
         self.popTetromino()
 
-    def run(self):
-        asyncio.get_event_loop().run_until_complete(self.loop())
-
     async def loop(self):
         '''Runs the game thread.'''
 
@@ -178,7 +173,7 @@ class Tetris(threading.Thread):
             print("Updating message...")
             await self.updateMessage()
 
-            time.sleep(Tetris.update_time)
+            await asyncio.sleep(Tetris.update_time)
         
         print("Finished a Tetris game!")
         TetrisCog.remove_game(self.message.id)
@@ -201,7 +196,7 @@ class Tetris(threading.Thread):
             self.last_message_text = text
             await self.message.edit(content=text)
 
-    def controlEvent(self, action: str):
+    async def controlEvent(self, action: str):
         self.actions[action]()
 
     def cw(self):
