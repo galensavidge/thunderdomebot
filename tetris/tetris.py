@@ -66,8 +66,8 @@ class Tetris:
     # Main board
     board_width = 10
     board_height = 22
-    square_width = 3
-    square_height = 2
+    square_width = 1
+    square_height = 1
     board_position_x = 4
     board_position_y = 1
     spawn_x = 5
@@ -78,9 +78,9 @@ class Tetris:
     gui_height = 46
     gui_square_width = 1
     gui_squre_height = 1
-    saved_x = 2
-    saved_y = 2
-    queue_x = 37
+    saved_x = 1
+    saved_y = 1
+    queue_x = 36
     queue_y = 2
     queue_spacing = 6
     
@@ -180,8 +180,10 @@ class Tetris:
             await asyncio.sleep(Tetris.update_time)
         
         print("Finished a Tetris game!")
-        self.message.edit(content="Game over!")
-        self.message.clear_reactions()
+        await asyncio.gather(
+            self.message.edit(content="Game over!"),
+            self.message.clear_reactions(),
+        )
         TetrisCog.remove_game(self.message.id)
 
     async def updateMessage(self):
@@ -197,7 +199,7 @@ class Tetris:
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
         # Update message
-        text = "```{}```".format(self.main_board)
+        text = "```{}```".format(self.gui_board)
         if text != self.last_message_text:
             self.last_message_text = text
             await self.message.edit(content=text)
