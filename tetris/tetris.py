@@ -24,7 +24,7 @@ class TetrisCog(Cog):
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
         TetrisCog.active_games[message.id] = game
-        asyncio.create_task(game.loop())
+        asyncio.ensure_future(game.loop())
     
     @Cog.listener()
     async def on_reaction_add(self, reaction, user):
