@@ -100,7 +100,8 @@ class Tetris:
         self.playing = True
 
         # Boards
-        self.main_board = Board(Tetris.board_width, Tetris.board_height, Tetris.square_width, Tetris.square_height)
+        # self.main_board = Board(Tetris.board_width, Tetris.board_height, Tetris.square_width, Tetris.square_height)
+        self.main_board = Board(Tetris.gui_width, Tetris.gui_height, Tetris.gui_square_width, Tetris.gui_squre_height)
         self.gui_board = Board(Tetris.gui_width, Tetris.gui_height, Tetris.gui_square_width, Tetris.gui_squre_height)
 
         print("Main board Frame: width={0.width}, height={0.height}".format(self.main_board.frame))
@@ -199,7 +200,7 @@ class Tetris:
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
         # Update message
-        text = "```{}```".format(self.gui_board)
+        text = "```{}```".format(self.main_board)
         if text != self.last_message_text:
             self.last_message_text = text
             await self.message.edit(content=text)
