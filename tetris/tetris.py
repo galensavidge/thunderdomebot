@@ -32,8 +32,10 @@ class TetrisCog(Cog):
         if user != self.bot.user:
             game = TetrisCog.active_games.get(reaction.message.id, None)
             if game is not None and str(reaction.emoji) in TetrisCog.emoji_list:
-                game.controlEvent(str(reaction.emoji))
-                await reaction.message.remove_reaction(reaction, user)
+                await asyncio.gather(
+                    game.controlEvent(str(reaction.emoji)),
+                    reaction.message.remove_reaction(reaction, user),
+                )
     
     @Cog.listener()
     async def on_message_delete(self, message):
