@@ -20,6 +20,7 @@ class TetrisCog(Cog):
     
     @commands.command(name="tetris", help="Starts an inline Tetris game here!")
     async def play_tetris(self, ctx):
+        message = await ctx.send("Game starting...")
         await TetrisCog.add_all_emoji(message)
         game = Tetris(ctx, message)
         TetrisCog.active_games[message.id] = game
