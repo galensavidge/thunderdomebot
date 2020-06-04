@@ -61,7 +61,7 @@ class TetrisCog(Cog):
 
 class Tetris:
 
-    update_time = 0.5
+    update_time = 0.2
 
     # Main board
     board_width = 10
@@ -117,11 +117,11 @@ class Tetris:
         
         # Timer for automatic drop
         self.drop_timer = 0
-        self.drop_timer_duration = 3
+        self.drop_timer_duration = 1.5
 
         # Timer for placement
         self.palce_timer = 0
-        self.place_timer_duration = 2
+        self.place_timer_duration = 1.5
 
         # Timer to prevent double dropping
         self.spawning = True
