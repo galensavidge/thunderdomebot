@@ -59,7 +59,7 @@ class TetrisCog(Cog):
 class Tetris:
 
     framerate = 5
-    update_time = 1.0/framerate
+    update_time = 0.2
     difficulty_level_time = 20*update_time
 
     # Main board
@@ -205,7 +205,7 @@ class Tetris:
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
         # Draw timer
-        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3}".format(self.timer))
+        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3d}".format(self.timer))
 
         # Update message
         text = "```{}```".format(self.gui_board)
