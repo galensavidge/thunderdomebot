@@ -58,7 +58,9 @@ class TetrisCog(Cog):
 
 class Tetris:
 
-    update_time = 0.2
+    framerate = 5
+    update_time = 1.0/framerate
+    difficulty_level_time = 20*update_time
 
     # Main board
     board_width = 10
@@ -170,12 +172,22 @@ class Tetris:
                 self.spawn_timer = 0
 
             await self.updateMessage()
+            
+           # Increase difficulty
+            if self.timer % Tetris.difficulty_level_time == 0:
+                if self.drop_timer_duration > 3*Tetris.update_time:
+                    self.drop_timer_duration -= 2*Tetris.update_time
+                elif self.drop_timer_duration > Tetris.update_time:
+                    self.drop_timer_duration -= Tetris.update_time
 
+                self.place_timer_duration = self.drop_timer_duration/2 + Tetris.framerate*2
+
+            # Sleep
             await asyncio.sleep(Tetris.update_time)
         
         print("Finished a Tetris game!")
         await asyncio.gather(
-            self.message.edit(content="Game over!"),
+            self.message.edit(content="Game over! You survived for {} seconds.".format(self.timer)),
             self.message.clear_reactions(),
         )
         TetrisCog.remove_game(self.message.id)
@@ -192,6 +204,9 @@ class Tetris:
             Tetris.board_width*Tetris.square_width+1, Tetris.board_height*Tetris.square_height+1)
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
+        # Draw timer
+        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3}".format(self.timer))
+
         # Update message
         text = "```{}```".format(self.gui_board)
         if text != self.last_message_text:
