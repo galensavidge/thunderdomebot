@@ -205,7 +205,7 @@ class Tetris:
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
         # Draw timer
-        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3d}".format(self.timer))
+        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3d}".format(int(self.timer)))
 
         # Update message
         text = "```{}```".format(self.gui_board)
