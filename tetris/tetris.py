@@ -87,7 +87,7 @@ class Tetris:
     next_length = 6
 
     # How often to bump up difficulty
-    difficulty_level_time = 5*Tetris.framerate
+    difficulty_level_time = 5*framerate
     
     def __init__(self, ctx, message):
         # Message
