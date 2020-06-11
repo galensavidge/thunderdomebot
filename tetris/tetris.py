@@ -187,7 +187,7 @@ class Tetris:
         
         print("Finished a Tetris game!")
         await asyncio.gather(
-            self.message.edit(content="Game over! You survived for {.1f} seconds.".format(self.timer*Tetris.update_time)),
+            self.message.edit(content="Game over! You survived for {:.1f} seconds.".format(self.timer*Tetris.update_time)),
             self.message.clear_reactions(),
         )
         TetrisCog.remove_game(self.message.id)
