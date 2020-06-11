@@ -87,7 +87,7 @@ class Tetris:
     next_length = 6
 
     # How often to bump up difficulty
-    difficulty_level_time = 5 # In seconds
+    difficulty_level_time = 5*Tetris.framerate
     
     def __init__(self, ctx, message):
         # Message
@@ -145,8 +145,8 @@ class Tetris:
 
         print("Started a Tetris game!")
         while self.playing:
-            # General timer
-            self.timer += Tetris.update_time
+            # Update counter
+            self.timer += 1
 
             # Slowly drop controlled tetromino
             self.drop_timer += Tetris.update_time
@@ -173,21 +173,21 @@ class Tetris:
 
             await self.updateMessage()
             
-           # Increase difficulty
+            # Increase difficulty
             if self.timer % Tetris.difficulty_level_time == 0:
-                if self.drop_timer_duration > 3*Tetris.update_time:
-                    self.drop_timer_duration -= 2*Tetris.update_time
-                elif self.drop_timer_duration > Tetris.update_time:
-                    self.drop_timer_duration -= Tetris.update_time
+                if self.drop_timer_duration > 3:
+                    self.drop_timer_duration -= 2
+                elif self.drop_timer_duration > 1:
+                    self.drop_timer_duration -= 1
 
-                self.place_timer_duration = self.drop_timer_duration/2 + Tetris.framerate*2
+                self.place_timer_duration = self.drop_timer_duration/2 + Tetris.framerate
 
             # Sleep
             await asyncio.sleep(Tetris.update_time)
         
         print("Finished a Tetris game!")
         await asyncio.gather(
-            self.message.edit(content="Game over! You survived for {} seconds.".format(self.timer)),
+            self.message.edit(content="Game over! You survived for {.1f} seconds.".format(self.timer*Tetris.update_time)),
             self.message.clear_reactions(),
         )
         TetrisCog.remove_game(self.message.id)
@@ -205,7 +205,7 @@ class Tetris:
         self.gui_board.frame.drawFrame(Tetris.board_position_x, Tetris.board_position_y, self.main_board.frame)
         
         # Draw timer
-        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3d}".format(int(self.timer)))
+        self.gui_board.frame.drawString(0, Tetris.gui_height-2, "{:3d}".format(int(self.timer*Tetris.update_time)))
 
         # Update message
         text = "```{}```".format(self.gui_board)
