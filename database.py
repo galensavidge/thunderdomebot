@@ -5,25 +5,47 @@ from psycopg2.extras import DictCursor
 from datetime import datetime
 
 DATABASE_URL = os.environ['DATABASE_URL']
-db = psycopg2.connect(DATABASE_URL, sslmode='require')
-print("Just made a db connection") #DEBUG
 
+def create_guild_tables(guild_id):
+    database = Database()
+    table_name = "messages_{}".format(guild_id)
+    cursor = database.get_cursor()
 
-def close():
-    db.close()
+    cursor.execute("SELECT to_regclass('{}')".format(table_name))
+    table_exists = cursor.fetchone()[0]
+    if not table_exists:
+        cursor.execute("CREATE TABLE {} (message_id BIGINT, author_id BIGINT, emoji VARCHAR(128), "
+                        "count INT, sendtime TIMESTAMP, updatetime TIMESTAMP)".format(table_name))
+        database.commit()
 
-def commit():
-    db.commit()
+        print("Successfully created table ", table_name)
 
-def get_cursor():
-    return db.cursor(cursor_factory=DictCursor)
-
+        cursor.close()
 
 def sql_string(object):
     return "\'{}\'".format(str(object))
 
+class Database():
+    connection = None
 
-def update_message_in_db(message: discord.Message, guild_id: int):
+    def __init__(self):
+        if self.connection is None:
+            self.connection = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+    def commit(self):
+        self.connection.commit()
+
+    def get_cursor(self):
+        return self.connection.cursor(cursor_factory=DictCursor)
+
+    def close(self):
+        self.connection.close()
+
+class Table():
+
+
+
+def update_message_in_db(message: discord.Message):
     '''Updates all database rows for the passed message'''
 
     count_list = {}
@@ -37,10 +59,10 @@ def update_message_in_db(message: discord.Message, guild_id: int):
     
     if len(count_list) > 0:
         for emoji in count_list.keys():
-            write_to_db(message.id, message.author.id, emoji, count_list[emoji], message.created_at, guild_id)
+            write_to_db(message.id, message.author.id, emoji, count_list[emoji], message.created_at, message.guild.id)
     else:
         cursor = get_cursor()
-        cursor.execute("DELETE FROM messages_{} WHERE message_id = {}".format(guild_id, message.id)) # Delete if the message has no reactions
+        cursor.execute("DELETE FROM messages_{} WHERE message_id = {}".format(message.guild.id, message.id)) # Delete if the message has no reactions
         cursor.close()
         
 
