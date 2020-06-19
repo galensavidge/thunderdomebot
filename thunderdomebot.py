@@ -4,7 +4,6 @@ import os
 
 from reactions import Reactions
 import database
-import tables
 
 
 bot = commands.Bot(command_prefix="tdb!")
@@ -19,7 +18,7 @@ async def on_ready():
     
     # if !database_exists:
     for guild in bot.guilds:
-        tables.create_guild_tables(guild.id)
+        database.create_guild_tables(guild.id)
         await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
     
     await bot.change_presence(activity=discord.Game(name="tdb!help | "+github_url), status=discord.Status.online)
@@ -38,6 +37,7 @@ if __name__ == "__main__":
     else:
         token = os.environ['BOT_TOKEN']
     
+    database = database.Database()
     bot.add_cog(Reactions(bot))
     bot.run(token)
 
