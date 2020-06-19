@@ -87,7 +87,7 @@ class Reactions(Cog):
             sql_emoji_command = ""
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
-        cursor = self.messages.get_cursor()
+        cursor = self.messages.db.get_cursor()
         cursor.execute("SELECT message_id, MAX(author_id), SUM(count) as score, MAX(sendtime) as time FROM messages_{} {}GROUP BY message_id ORDER BY score DESC, time DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
@@ -156,7 +156,7 @@ class Reactions(Cog):
             sql_emoji_command = ""
         else:
             sql_emoji_command = "WHERE emoji = "+database.sql_string(emoji)+" "
-        cursor = self.messages.get_cursor()
+        cursor = self.messages.db.get_cursor()
         cursor.execute("SELECT author_id, SUM(count) as score FROM messages_{} {}GROUP BY author_id ORDER BY score DESC LIMIT {}".format(ctx.guild.id, sql_emoji_command, number))
         rows = cursor.fetchall()
         cursor.close()
