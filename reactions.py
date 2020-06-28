@@ -31,7 +31,7 @@ class Reactions(Cog):
 
     @Cog.listener()
     async def on_guild_join(self, guild):
-        tables.create_guild_tables(guild.id)
+        database.create_guild_tables(guild.id)
         await self.read_message_history(guild)       # Read entire server message history
 
 
