@@ -19,14 +19,16 @@ class Reactions(Cog):
     async def on_raw_reaction_add(self, payload):
         message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         print("logged "+str(payload.emoji)+" given to "+message.author.name)
-        self.messages.update_message_in_db(message)
+        if not message.author.bot:
+            self.messages.update_message_in_db(message)
 
 
     @Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         print("logged "+str(payload.emoji)+" removed from "+message.author.name)
-        self.messages.update_message_in_db(message)
+        if not message.author.bot:
+            self.messages.update_message_in_db(message)
 
 
     @Cog.listener()
@@ -50,7 +52,8 @@ class Reactions(Cog):
 
                 for message in messages:
                     messages_parsed += 1
-                    self.messages.update_message_in_db(message)
+                    if not message.author.bot:
+                        self.messages.update_message_in_db(message)
                 
                 print("parsed "+str(messages_parsed)+" messages in "+channel.name)
 
