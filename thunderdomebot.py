@@ -1,13 +1,15 @@
 import os
 
 import discord
+from discord import Intents
 from discord.ext import commands
 
 import database
 import reactions
 from tetris import tetris
 
-bot: commands.Bot = commands.Bot(command_prefix="tdb!")
+intents = Intents.all()
+bot: commands.Bot = commands.Bot(intents=intents, command_prefix="tdb!")
 
 github_url = "git.io/Jf27r"
 
