@@ -40,9 +40,9 @@ if __name__ == "__main__":
     else:
         token = os.environ['BOT_TOKEN']
     
-    database = database.Database()
+    db = database.Database()
     bot.add_cog(reactions.Reactions(bot))
     bot.add_cog(tetris.TetrisCog(bot))
     bot.run(token)
 
-    database.close()
+    db.close()
