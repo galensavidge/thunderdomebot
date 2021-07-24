@@ -1,26 +1,26 @@
-import discord
-from discord.ext import commands
 import os
 
-from reactions import Reactions
-import database
-from database import create_guild_tables
-from tetris.tetris import TetrisCog
+import discord
+from discord.ext import commands
 
-bot = commands.Bot(command_prefix="tdb!")
+import database
+import reactions
+from tetris import tetris
+
+bot: commands.Bot = commands.Bot(command_prefix="tdb!")
 
 github_url = "git.io/Jf27r"
 
 @bot.event
 async def on_ready():
     print("ThunderDomeBot online!")
-    await bot.change_presence(activity=discord.Game(name="Restarting..."), status=discord.Status.dnd)
+    # await bot.change_presence(activity=discord.Game(name="Restarting..."), status=discord.Status.dnd)
 
     
-    # if !database_exists:
-    for guild in bot.guilds:
-        create_guild_tables(guild.id)
-        await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
+    # # if !database_exists:
+    # for guild in bot.guilds:
+    #     database.create_guild_tables(guild.id)
+    #     await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
     
     await bot.change_presence(activity=discord.Game(name="tdb!help | "+github_url), status=discord.Status.online)
 
@@ -39,8 +39,8 @@ if __name__ == "__main__":
         token = os.environ['BOT_TOKEN']
     
     database = database.Database()
-    bot.add_cog(Reactions(bot))
-    bot.add_cog(TetrisCog(bot))
+    # bot.add_cog(reactions.Reactions(bot))
+    # bot.add_cog(tetris.TetrisCog(bot))
     bot.run(token)
 
     database.close()
