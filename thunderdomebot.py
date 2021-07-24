@@ -16,13 +16,13 @@ github_url = "git.io/Jf27r"
 @bot.event
 async def on_ready():
     print("ThunderDomeBot online!")
-    # await bot.change_presence(activity=discord.Game(name="Restarting..."), status=discord.Status.dnd)
+    await bot.change_presence(activity=discord.Game(name="Restarting..."), status=discord.Status.dnd)
 
     
-    # # if !database_exists:
-    # for guild in bot.guilds:
-    #     database.create_guild_tables(guild.id)
-    #     await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
+    # if !database_exists:
+    for guild in bot.guilds:
+        database.create_guild_tables(guild.id)
+        await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
     
     await bot.change_presence(activity=discord.Game(name="tdb!help | "+github_url), status=discord.Status.online)
 
@@ -41,8 +41,8 @@ if __name__ == "__main__":
         token = os.environ['BOT_TOKEN']
     
     database = database.Database()
-    # bot.add_cog(reactions.Reactions(bot))
-    # bot.add_cog(tetris.TetrisCog(bot))
+    bot.add_cog(reactions.Reactions(bot))
+    bot.add_cog(tetris.TetrisCog(bot))
     bot.run(token)
 
     database.close()
