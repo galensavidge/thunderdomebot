@@ -67,8 +67,7 @@ class Reactions(Cog):
     # Commands
     @commands.command(
         name="reactions",
-        help="Gets the number of reactions of a specific type users have "
-             "received.",
+        help="Find out how many reactions you've received",
     )
     async def get_reactions(self, ctx: discord.ext.commands.Context,
                             emoji: str):
@@ -79,21 +78,22 @@ class Reactions(Cog):
             users = [ctx.message.author]
 
         for user in users:
-            cursor.execute(
-                "SELECT SUM(count) FROM messages_{} WHERE author_id = {} "
-                "AND emoji = {}"
-                .format(ctx.guild.id, user.id, database.sql_string(emoji)))
+            query = (f"SELECT SUM(count) FROM messages_{ctx.guild.id} WHERE "
+                     f"author_id = {user.id}")
+            if emoji is not None:
+                query += f" AND emoji = {database.sql_string(emoji)}"
+            cursor.execute(query)
             count = cursor.fetchone()[0]
-            await ctx.send("User {0} has received {1} {2}".format(
+            await ctx.send("{0} has received {1} {2}".format(
                 user.name,
                 "no" if count == 0 or count is None else str(count),
-                str(emoji),
+                "reactions" if emoji is None else str(emoji),
             ))
 
         cursor.close()
 
     @commands.command(name="top-messages",
-                      help="Finds the highest reacted message")
+                      help="Finds the messages with the most reactions")
     async def get_top_messages(self, ctx: discord.ext.commands.Context,
                                emoji: str = None, number: int = 5):
         if ctx.guild is None:
