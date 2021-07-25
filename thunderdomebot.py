@@ -21,6 +21,7 @@ async def on_ready():
     
     # if !database_exists:
     for guild in bot.guilds:
+        print(f"Parsing messages from {guild.name}...")
         database.create_guild_tables(guild.id)
         await bot.get_cog("Reactions").read_message_history(guild, num_messages=200)
     
