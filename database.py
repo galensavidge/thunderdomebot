@@ -95,7 +95,17 @@ class Messages(Table):
         self.db.commit()
 
 
-    def get_last_update_time(self, guild_id:int):
+    def purge_db(self, guild_id: int):
+        '''Deletes all entries in a guild's database'''
+        
+        table_name = "messages_{}".format(guild_id)
+        cursor = self.db.get_cursor()
+        cursor.execute("DELETE FROM {}".format(table_name))
+        cursor.close()
+        self.db.commit()
+
+
+    def get_last_update_time(self, guild_id: int):
         '''Returns the time the last database update occurred as a datetime object'''
 
         cursor = self.db.get_cursor()
