@@ -95,12 +95,12 @@ class Messages(Table):
         author_id: int,
         emoji: str,
         count: int,
-        time_sent: datetime,
+        time_sent: datetime.datetime,
         guild_id: int,
     ):
         """Writes one row to the message database"""
 
-        time_now = sql_string(datetime.utcnow())
+        time_now = sql_string(datetime.datetime.utcnow())
         sendtime = sql_string(time_sent)
         table_name = "messages_{}".format(guild_id)
 
