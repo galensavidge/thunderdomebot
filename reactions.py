@@ -70,7 +70,7 @@ class Reactions(Cog):
         help="Find out how many reactions you've received",
     )
     async def get_reactions(self, ctx: discord.ext.commands.Context,
-                            emoji: str):
+                            emoji: str = None):
         users = ctx.message.mentions
         cursor = self.messages.db.get_cursor()
 
