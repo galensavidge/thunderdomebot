@@ -234,20 +234,20 @@ class Reactions(Cog):
 
     @commands.command(name="leaderboardDelta")
     async def leaderboardDelta(self, ctx: discord.ext.commands.Context,
-                          emoji: str = None, number: int = 5):
+                          num_days: int = 7, emoji: str = None, number: int = 5):
         if number < 1 or number > 20:
             await ctx.send(
                 "Number of messages must be between **1** and **20**")
             return
 
         now = datetime.datetime.now()
-        oneWeekAgo = now - datetime.timedelta(days=7)
+        timespan = now - datetime.timedelta(days=num_days)
 
         if emoji is None:
-            sql_where_clause = "WHERE sendtime > '" + str(oneWeekAgo) + "' "
+            sql_where_clause = "WHERE sendtime > '" + str(timespan) + "' "
         else:
             sql_where_clause = "WHERE emoji = " + database.sql_string(
-                emoji) + " AND sendtime > '" + str(oneWeekAgo) + "' "
+                emoji) + " AND sendtime > '" + str(timespan) + "' "
         cursor = self.messages.db.get_cursor()
         cursor.execute(
             "SELECT author_id, SUM(count) as score FROM messages_{} {}"
