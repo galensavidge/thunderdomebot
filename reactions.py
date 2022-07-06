@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 import pytz
+import datetime
 
 import database
 
@@ -202,6 +203,56 @@ class Reactions(Cog):
             "SELECT author_id, SUM(count) as score FROM messages_{} {}"
             "GROUP BY author_id ORDER BY score DESC LIMIT {}"
             .format(ctx.guild.id, sql_emoji_command, number))
+        rows = cursor.fetchall()
+        cursor.close()
+
+        if len(rows) == 0:
+            await ctx.send("No users found with any {}".format(str(emoji)))
+            return
+
+        title = "Top {} by {}".format(
+            str(number) + " users" if number > 1 else "user",
+            str(emoji) if emoji is not None else "all reactions",
+        )
+        description = ""
+        listnum = 0
+
+        for row_elements in rows:
+            user = self.bot.get_user(row_elements[0])
+            score = row_elements[1]
+            listnum += 1
+
+            if user is not None:
+                name = user.name
+            else:
+                name = "[User not found]"
+            # Discord names can be up to 32 characters long
+            description += "{}. **{:<40}**{}\n".format(listnum, name, score)
+
+        embed = discord.Embed(title=title, description=description)
+        await ctx.send(embed=embed)
+
+    @commands.command(name="leaderboardDelta")
+    async def leaderboardDelta(self, ctx: discord.ext.commands.Context,
+                          emoji: str = None, number: int = 5):
+        if number < 1 or number > 20:
+            await ctx.send(
+                "Number of messages must be between **1** and **20**")
+            return
+
+        now = datetime.datetime.now()
+        oneWeekAgo = now - datetime.timedelta(days=7)
+
+        if emoji is None:
+            sql_where_clause = "WHERE sendtime > " + str(oneWeekAgo) + " "
+        else:
+            sql_where_clause = "WHERE emoji = " + database.sql_string(
+                emoji) + " AND sendtime > " + str(oneWeekAgo) + " "
+        cursor = self.messages.db.get_cursor()
+        cursor.execute(
+            "SELECT author_id, SUM(count) as score FROM messages_{} {}"
+            "GROUP BY author_id ORDER BY score DESC LIMIT {}"
+            .format(ctx.guild.id, sql_where_clause, number))
         rows = cursor.fetchall()
         cursor.close()
 
