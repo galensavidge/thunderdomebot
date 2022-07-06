@@ -260,9 +260,10 @@ class Reactions(Cog):
             await ctx.send("No users found with any {}".format(str(emoji)))
             return
 
-        title = "Top {} by {}".format(
-            str(number) + " users" if number > 1 else "user",
+        title = "Change in {} for top {} in last {} days".format(
             str(emoji) if emoji is not None else "all reactions",
+            str(number) + " users" if number > 1 else "user",
+            num_days
         )
         description = ""
         listnum = 0
