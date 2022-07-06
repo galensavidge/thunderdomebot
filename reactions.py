@@ -244,10 +244,10 @@ class Reactions(Cog):
         oneWeekAgo = now - datetime.timedelta(days=7)
 
         if emoji is None:
-            sql_where_clause = "WHERE sendtime > " + str(oneWeekAgo) + " "
+            sql_where_clause = "WHERE sendtime > '" + str(oneWeekAgo) + "' "
         else:
             sql_where_clause = "WHERE emoji = " + database.sql_string(
-                emoji) + " AND sendtime > " + str(oneWeekAgo) + " "
+                emoji) + " AND sendtime > '" + str(oneWeekAgo) + "' "
         cursor = self.messages.db.get_cursor()
         cursor.execute(
             "SELECT author_id, SUM(count) as score FROM messages_{} {}"
