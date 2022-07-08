@@ -244,10 +244,10 @@ class Reactions(Cog):
         timespan = now - datetime.timedelta(days=num_days)
 
         if emoji is None:
-            sql_where_clause = "WHERE sendtime > '" + str(timespan) + "' OR updatetime > '" + str(timespan) + "' "
+            sql_where_clause = "WHERE sendtime > '" + str(timespan) + "' "
         else:
             sql_where_clause = "WHERE emoji = " + database.sql_string(
-                emoji) + " AND sendtime > '" + str(timespan) + "' OR updatetime > '" + str(timespan) + "' "
+                emoji) + " AND sendtime > '" + str(timespan) + "' "
         cursor = self.messages.db.get_cursor()
         cursor.execute(
             "SELECT author_id, SUM(count) as score FROM messages_{} {}"
