@@ -232,8 +232,8 @@ class Reactions(Cog):
         embed = discord.Embed(title=title, description=description)
         await ctx.send(embed=embed)
 
-    @commands.command(name="leaderboardDelta")
-    async def leaderboardDelta(self, ctx: discord.ext.commands.Context,
+    @commands.command(name="delta")
+    async def delta(self, ctx: discord.ext.commands.Context,
                           num_days: int = 7, emoji: str = None, number: int = 5):
         if number < 1 or number > 20:
             await ctx.send(
@@ -244,10 +244,10 @@ class Reactions(Cog):
         timespan = now - datetime.timedelta(days=num_days)
 
         if emoji is None:
-            sql_where_clause = "WHERE sendtime > '" + str(timespan) + "' "
+            sql_where_clause = "WHERE sendtime > '" + str(timespan) + "' OR updatetime > '" + str(timespan) + "' "
         else:
             sql_where_clause = "WHERE emoji = " + database.sql_string(
-                emoji) + " AND sendtime > '" + str(timespan) + "' "
+                emoji) + " AND sendtime > '" + str(timespan) + "' OR updatetime > '" + str(timespan) + "' "
         cursor = self.messages.db.get_cursor()
         cursor.execute(
             "SELECT author_id, SUM(count) as score FROM messages_{} {}"
